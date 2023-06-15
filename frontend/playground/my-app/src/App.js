@@ -2,6 +2,7 @@ import logo from "./logo.svg";
 import "./App.css";
 import React from "react";
 import ReactDOM from "react-dom/client";
+import Greeting from "./components";
 
 function App() {
   return (
