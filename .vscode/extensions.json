@@ -1,0 +1,10 @@
+{
+    "recommendations": [
+        "esbenp.prettier-vscode",     // Prettier - Code formatter
+        "dbaeumer.vscode-eslint",     // ESLint
+        "ms-python.python",           // Python
+        "redhat.vscode-yaml",         // YAML
+        "editorconfig.editorconfig",  // EditorConfig
+        "eamodio.gitlens"             // GitLens
+    ]
+}

@@ -1,11 +1,9 @@
 # Project Name
-> Short description of what this project does.
+> Toolbox for enforcing purpose-based access control in cloud native applications.
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](#)
-[![Build Status](https://travis-ci.org/username/projectname.svg?branch=master)](https://travis-ci.org/username/projectname)
-
-One to two paragraphs providing an overview of why the project exists.
+[![Terraform](https://github.com/christianstubbe/usability-engineering/actions/workflows/terraform.yml/badge.svg)](https://github.com/christianstubbe/usability-engineering/actions/workflows/terraform.yml)
 
 ## Table of Contents
 - [Project Name](#project-name)
@@ -16,7 +14,6 @@ One to two paragraphs providing an overview of why the project exists.
   - [Usage](#usage)
   - [Testing](#testing)
   - [Deployment](#deployment)
-  - [Contact](#contact)
   - [License](#license)
   - [Acknowledgements](#acknowledgements)
 
@@ -28,13 +25,15 @@ One to two paragraphs providing an overview of why the project exists.
 - Different set of prerequisites if applicable.
 
 ```sh
-example commands to install prerequisites
+python -m venv .env
+source .env/bin/activate
+pip install -r requirements.txt
 ```
 
 ### Setup
 
 ```sh
-example commands to setup your project
+pip install -r requirements.txt
 ```
 
 ## Usage
@@ -60,18 +59,11 @@ example commands to run tests
 
 Add additional notes about how to deploy this on a live system or a platform.
 
-## Contact
-
-Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email
-
-Project Link: [https://github.com/your/repo](https://github.com/your/repo)
 
 ## License
 
-Distributed under the MIT License. See `LICENSE.md` for more information.
+Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Acknowledgements
 
-- Name of the creator, supporters, or people who helped in the project.
-- Inspiration.
-- References you used.
+- Dr. Frank Pallas

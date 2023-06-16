@@ -1,0 +1,7 @@
+# Configuration file for the serverless function
+
+# PBAC-specific settings
+purposes:
+  - marketing
+  - hr
+  - identification
