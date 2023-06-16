@@ -1,6 +1,8 @@
 import "./App.css";
 import { MainComponent } from "./components";
 
+// Add React.Frangment?
+
 function App() {
   return (
     <div className="App">

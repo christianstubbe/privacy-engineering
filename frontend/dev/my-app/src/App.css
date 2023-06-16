@@ -36,3 +36,11 @@
     transform: rotate(360deg);
   }
 }
+
+.main {
+  background-color: aliceblue;
+  color: #282c34;
+  font-size: medium;
+  border: 3px solid crimson;
+  padding: 20px;
+}
