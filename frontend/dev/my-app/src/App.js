@@ -1,5 +1,5 @@
 import "./App.css";
-import { MainComponent } from "./components";
+import { MainComponent } from "./components/Main";
 
 // Add React.Frangment?
 

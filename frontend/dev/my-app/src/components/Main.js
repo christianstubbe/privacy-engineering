@@ -7,5 +7,4 @@ const MainComponent = () => {
   return <Container className="main"> Here comes the main component</Container>;
 };
 
-const NewComponent = () => {};
 export { MainComponent };
