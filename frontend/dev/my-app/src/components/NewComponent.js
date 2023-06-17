@@ -1,3 +1,0 @@
-const NewComponent = () => {};
-
-export { NewComponent };
