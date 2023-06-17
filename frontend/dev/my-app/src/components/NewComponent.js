@@ -1,0 +1,3 @@
+const NewComponent = () => {};
+
+export { NewComponent };
