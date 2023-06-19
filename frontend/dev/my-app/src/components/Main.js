@@ -4,7 +4,7 @@
 import Container from "@mui/material/Container";
 
 const MainComponent = () => {
-  return <Container className="main"> Here comes the main component</Container>;
+  return <main className="main"> Here comes the main component</main>;
 };
 
 export { MainComponent };
