@@ -1,49 +1,9 @@
-.navbar {
-  margin-top: 10px;
-  margin-left: 10px;
-  margin-right: 10px;
-  align-items: center;
-  background-color: white;
-  border-bottom: 10px;
-  display: flex;
-  height: 60px;
-  justify-content: space-between;
-  position: fixed;
-  width: 98.5%;
-  z-index: 10;
-  border: 2px solid black;
-  border-radius: 5px;
-}
-
-.userInfo {
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  margin-right: 45px;
-  width: 100px;
-}
-
 .icon {
   color: black;
-  font-size: 3em;
+  font-size: 2em;
 }
-
-.infoToolbox {
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  margin-right: 45px;
-  margin-left: 45px;
-  height: 60px;
-}
-
-.infoToolbox h4 {
-  font-size: 20px;
-  color: black;
-}
-
 .logo {
   height: 41px;
-  width: 110ppx;
-  margin-right: 20px;
+  width: 100px;
+  border-radius: 5px;
 }
