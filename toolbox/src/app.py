@@ -1,24 +1,20 @@
-from fastapi import FastAPI, Request, HTTPException, Depends
-import casbin
+from fastapi import FastAPI, APIRouter, Request, HTTPException, Depends
+import logging
+# Middleware
+from access import AccessControlMiddleware
+# Router
+from storage import cloud_router
 
+# Configure logging
+logging.basicConfig(level=logging.ERROR, format='%(levelname)s: %(message)s')
+
+# Our main process
 app = FastAPI()
 
-# Initialize Casbin enforcer with model and policy files
-enforcer = casbin.Enforcer("rbac_model.conf", "rbac_policy.csv")
+# Configure 
+app.add_middleware(AccessControlMiddleware)
 
-# Dependency to enforce access control
-async def enforce_access_control(request: Request):
-    # Get the subject, object, and action from request headers (or any other source)
-    sub = request.headers.get("subject")
-    obj = request.headers.get("object")
-    act = request.headers.get("action")
+# Include the router in the FastAPI app
+app.include_router(cloud_router, prefix="/cloud")
 
-    # Check if access is allowed using Casbin enforcer
-    if not enforcer.enforce(sub, obj, act):
-        # Raise 403 Forbidden if access is denied
-        raise HTTPException(status_code=403, detail="Access denied")
-
-# Define a protected route
-@app.get("/protected-resource", dependencies=[Depends(enforce_access_control)])
-async def protected_resource():
-    return {"message": "Access to protected resource granted"}
+logging.info("Serverless function was triggered!")
