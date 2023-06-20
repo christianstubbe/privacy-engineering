@@ -44,15 +44,16 @@ function Navbar() {
             <Typography
               variant="h6"
               component="div"
+              align="center"
               sx={{ flexGrow: 1, color: "black" }}
             >
-              Internal Image Upload
+              [Name of the Toolbox]
             </Typography>
             <div>
               <BiIcons.BiUserCircle className="icon" />
             </div>
-            <Button sx={{ color: "black" }} color="inherit">
-              Login
+            <Button sx={{ color: "green" }} color="inherit">
+              You're logged in!
             </Button>
           </Toolbar>
         </AppBar>
