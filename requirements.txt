@@ -4,8 +4,10 @@ google-cloud-storage==1.42.0
 # Optionally, if you are using environment variables
 python-dotenv==0.19.0
 
-opa-python-client==0.0.4
-
 fastapi==0.97.0
 
-mkdocs-material=="9.x"
+mkdocs-material
+
+casbin
+
+uvicorn[standard]

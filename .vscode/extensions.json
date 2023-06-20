@@ -5,6 +5,7 @@
         "ms-python.python",           // Python
         "redhat.vscode-yaml",         // YAML
         "editorconfig.editorconfig",  // EditorConfig
-        "eamodio.gitlens"             // GitLens
+        "eamodio.gitlens",            // GitLens
+        "hashicorp.terraform"         // Terraform
     ]
 }
