@@ -21,12 +21,13 @@
 
 ### Prerequisites
 
-- List of prerequisites, libraries, and tools.
-- Different set of prerequisites if applicable.
+- Google Cloud CLI
+- Terraform
+- Serverless CLI
 
 ```sh
-python -m venv .env
-source .env/bin/activate
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
@@ -41,7 +42,8 @@ pip install -r requirements.txt
 Explain how to use your project and include code examples if relevant.
 
 ```sh
-example commands or code to run the project
+# To deploy manually instead of automatically using a Github action
+terraform apply
 ```
 
 > Add screenshots or screen gifs here to make it more appealing.
