@@ -1,20 +1,31 @@
 from fastapi import FastAPI, APIRouter, Request, HTTPException, Depends
 import logging
 # Middleware
-from access import AccessControlMiddleware
+from access.pep import AccessControlMiddleware
 # Router
-from storage import cloud_router
+from storage.storage import cloud_router
+from access.pap import pap_router
 
-# Configure logging
-logging.basicConfig(level=logging.ERROR, format='%(levelname)s: %(message)s')
+# Configure app-wide logging 
+# N.B.: logs are automatically handle by the built-in interface of the cloud provider
+logging.basicConfig(level=logging.ERROR, format='%(name)s - %(levelname)s - %(message)s')
+
+logger = logging.getLogger(__name__)
 
 # Our main process
 app = FastAPI()
 
-# Configure 
 app.add_middleware(AccessControlMiddleware)
 
-# Include the router in the FastAPI app
-app.include_router(cloud_router, prefix="/cloud")
+app.include_router(cloud_router, prefix="/api/v1")
+app.include_router(pap_router, prefix="/api/v1")
 
-logging.info("Serverless function was triggered!")
+@app.get("/")
+def hello_world():
+    return {"message": "hello, world!"}
+
+@app.get("/health")
+def health_check():
+    return {"status": "healthy"}
+
+logger.info("Serverless function was triggered!")

@@ -4,7 +4,6 @@ provider:
   name: google
   runtime: python38
   project: your-gcp-project-id
-  credentials: path-to-your-gcp-keyfile.json
   region: europe-west-1
 
 plugins:
@@ -18,8 +17,6 @@ custom:
 functions:
   hello:
     handler: handler.handler
-    events:
-      - http: path/to/your/endpoint
     environment:  # Environment variables specific to this function
       FUNCTION_SPECIFIC_VAR: "This is specific to the 'hello' function"
     
