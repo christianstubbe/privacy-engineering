@@ -1,22 +1,20 @@
 // File to build the single React components
 
-// import MUI materials
-import Container from "@mui/material/Container";
 import * as React from "react";
-import Box from "@mui/material/Box";
-import Paper from "@mui/material/Paper";
-import Grid from "@mui/material/Grid";
-import "./Main.css";
 import Leftbox from "./Leftbox";
+import Rightbox from "./Rightbox";
 
 const MainComponent = () => {
   return (
-    <main className="main">
-      <div className="leftBox">
-        🛫 UPLOAD IMAGE
+    <main className="flex justify-evenly h-screen bg-slate-200">
+      <div className="basis-1/2 text-center text-lg font-mono mt-10">
+        UPLOAD IMAGE
         <Leftbox />
       </div>
-      <div className="rightBox"> 🛬 RETRIEVE IMAGES</div>
+      <div className="basis-1/2 text-center text-lg font-mono mt-10">
+        RETRIEVE IMAGES
+        <Rightbox />
+      </div>
     </main>
   );
 };
