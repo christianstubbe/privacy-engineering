@@ -6,8 +6,13 @@ import re
 
 # TODO: remove background from profile pictures retrieved from cloud storage solutions
 
+
 def redact_email(text):
-    return re.sub(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', '[REDACTED_EMAIL]', text)
+    return re.sub(
+        r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}",
+        "[REDACTED_EMAIL]", text
+    )
+
 
 def redact_phone_number(text):
-    return re.sub(r'\b\d{10}\b', '[REDACTED_PHONE]', text)
+    return re.sub(r"\b\d{10}\b", "[REDACTED_PHONE]", text)
