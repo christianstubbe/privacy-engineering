@@ -16,7 +16,7 @@ provider "google" {
 resource "google_storage_bucket" "default" {
   name                        = "privacy-engineering-toolbox-source"
   location                    = "EUROPE-WEST1"
-  force_destroy               = true
+  force_destroy               = false
 }
 
 data "archive_file" "default" {
