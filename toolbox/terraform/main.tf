@@ -1,12 +1,3 @@
-terraform {
-    required_providers {
-        google = {
-            source  = "hashicorp/google"
-            version = ">= 4.34.0"
-        }
-    }
-}
-
 provider "google" {
     project = "tu-berlin-privacy-engineering"
     region  = "europe-west1"
@@ -16,13 +7,13 @@ provider "google" {
 resource "google_storage_bucket" "default" {
   name                        = "privacy-engineering-toolbox-source"
   location                    = "EUROPE-WEST1"
-  force_destroy               = true
+  force_destroy               = false
 }
 
 data "archive_file" "default" {
   type        = "zip"
-  output_path = "/tmp/function-source.zip"
-  source_dir  = "../src/"
+  output_path = "/tmp/toolobox-source.zip"
+  source_dir  = "./toolbox/src/"
 }
 
 resource "google_storage_bucket_object" "object" {
