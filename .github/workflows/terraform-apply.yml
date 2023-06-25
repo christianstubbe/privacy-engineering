@@ -10,7 +10,7 @@ env:
   TF_CLOUD_ORGANIZATION: "peng-pbac-toolbox"
   TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
   TF_WORKSPACE: "peng-pbac-toolbox"
-  CONFIG_DIRECTORY: "./"
+  CONFIG_DIRECTORY: "./toolbox/terraform"
 
 jobs:
   terraform:
