@@ -21,6 +21,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Archive Code
+          run: |
+          zip -r my_archive.zip ./path/to/directory
+
+        - name: Upload Archive
+        uses: actions/upload-artifact@v2
+        with:
+            name: my-artifact
+            path: toolbox
+
       - name: Upload Configuration
         uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
         id: plan-upload
