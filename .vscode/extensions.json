@@ -6,6 +6,7 @@
         "redhat.vscode-yaml",         // YAML
         "editorconfig.editorconfig",  // EditorConfig
         "eamodio.gitlens",            // GitLens
-        "hashicorp.terraform"         // Terraform
+        "hashicorp.terraform",        // Terraform
+        "ms-python.flake8"            // Flake8
     ]
 }
