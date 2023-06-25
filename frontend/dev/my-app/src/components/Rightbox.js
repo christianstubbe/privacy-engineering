@@ -13,7 +13,7 @@ function Rightbox() {
         </div>
         <div className="relative h-358 w-340">
           <button
-            className="bg-green-600 h-8 w-20 border-1 ml-5 rounded text-xs font-mono absolute bottom-0 left-0  hover:bg-red-700"
+            className="bg-green-600 h-8 w-20 border-1 ml-5 rounded text-xs font-mono absolute bottom-0 left-0  hover:bg-green-700"
             type="button"
           >
             Apply

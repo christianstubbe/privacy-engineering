@@ -6,7 +6,7 @@ import Rightbox from "./Rightbox";
 
 const MainComponent = () => {
   return (
-    <main className="flex justify-evenly h-screen bg-slate-200">
+    <main className="flex justify-evenly h-screen bg-gradient-to-r from-sky-200 to-sky-300">
       <div className="basis-1/2 text-center text-lg font-mono mt-10">
         UPLOAD IMAGE
         <Leftbox />
