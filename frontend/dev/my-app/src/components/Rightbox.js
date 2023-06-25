@@ -3,7 +3,7 @@ import { Dropdown, Ripple, initTE } from "tw-elements";
 
 initTE({ Dropdown, Ripple });
 
-function Leftbox() {
+function Rightbox() {
   return (
     // add some tailwindcss here ..
     <div className="retrieve img h-screen">
@@ -30,4 +30,4 @@ function Leftbox() {
   );
 }
 
-export default Leftbox;
+export default Rightbox;
