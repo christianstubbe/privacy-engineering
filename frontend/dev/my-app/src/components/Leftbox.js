@@ -1,6 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
+import { Dropdown, Ripple, initTE } from "tw-elements";
+import { AiFillCaretUp, AiFillCaretDown } from "react-icons/ai";
+import list from "./list.json";
+
+initTE({ Dropdown, Ripple });
 
 function Leftbox() {
+  const [isOpen, setIsOpen] = useState(false);
   return (
     // add some tailwindcss here ..
     <div className="upload img h-screen">
@@ -27,9 +33,39 @@ function Leftbox() {
           />
         </div>
       </div>
-      <div className="relative grid grid-cols-2 gab-1">
-        <div>Button</div>
-        <div>[Drop down menu "Apply purpose"]</div>
+      <div className="relative grid grid-cols-2 gab-1 ml-8 mr-8 mt-10">
+        <div className="h-53">
+          <button
+            className="justify-center bg-green-600 h-16 w-40 border-1 rounded text font-mono hover:bg-green-700"
+            type="button"
+          >
+            Apply
+          </button>
+        </div>
+        <div className="relative flex flex-col items-center h-53">
+          {/* add "action:" for when clicking  */}
+          <button
+            onClick={() => setIsOpen((prev) => !prev)}
+            className="text font-mono bg-green-600 w-full h-16 items-center border-1 rounded"
+          >
+            Dropdown
+            {!isOpen ? (
+              <AiFillCaretDown className="h-8" />
+            ) : (
+              <AiFillCaretUp className="h-8" />
+            )}
+          </button>
+          {isOpen && (
+            <div className="bg-blue-400 absolute top-20 flex flex-col items-start rounded-lg p-2 w-full">
+              {/* map the json file list */}
+              {list.map((item, i) => (
+                <div className="flex w-full justify-between" key={i}>
+                  <h3>{item.purpose}</h3>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
