@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 import logging
 
 # Middleware
@@ -35,4 +35,5 @@ def health_check():
     return {"status": "healthy"}
 
 
-logger.info("Serverless function was triggered!")
+def entry_point(request: Request):
+    logger.info(f"Serverless function was triggered! {request}")
