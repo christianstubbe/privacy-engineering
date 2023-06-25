@@ -27,6 +27,10 @@ function Leftbox() {
           />
         </div>
       </div>
+      <div className="relative grid grid-cols-2 gab-1">
+        <div>Button</div>
+        <div>[Drop down menu "Apply purpose"]</div>
+      </div>
     </div>
   );
 }
