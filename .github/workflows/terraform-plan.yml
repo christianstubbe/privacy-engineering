@@ -4,7 +4,7 @@ on:
   pull_request:
 
 env:
-  TF_CLOUD_ORGANIZATION: ""
+  TF_CLOUD_ORGANIZATION: "peng-pbac-toolbox"
   TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
   TF_WORKSPACE: "peng-pbac-toolbox"
   CONFIG_DIRECTORY: "./toolbox/terraform"
@@ -20,6 +20,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Archive Code
+          run: |
+          zip -r my_archive.zip ./path/to/directory
+
+        - name: Upload Archive
+        uses: actions/upload-artifact@v2
+        with:
+            name: my-artifact
+            path: toolbox
 
       - name: Upload Configuration
         uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
