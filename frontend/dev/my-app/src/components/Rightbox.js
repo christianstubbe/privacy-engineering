@@ -7,7 +7,7 @@ function Rightbox() {
   return (
     // add some tailwindcss here ..
     <div className="retrieve img h-screen">
-      <div className="relative grid grid-cols-2 gap-1 mt-20 h-[50vh] p-3 bg-slate-400 ml-8 mr-8 shadow-lg hover:shadow-xl">
+      <div className="relative grid grid-cols-2 gap-1 mt-5 h-[50vh] p-3 bg-slate-400 ml-8 mr-8 shadow-lg hover:shadow-xl">
         <div className=" p-5 w-full items-center justify-center border border-black rounded hover:bg-blue-100 font-mono">
           [Here comes the dropdown menu]
         </div>
