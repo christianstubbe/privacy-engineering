@@ -1,7 +1,7 @@
 from google.cloud import storage
 
 
-def createGCSObject(bucket_name, source_file_name, destination_blob_name):
+def create_gcs_object(bucket_name, source_file_name, destination_blob_name):
     """Uploads a file to a Google Cloud Storage bucket."""
 
     storage_client = storage.Client()
@@ -12,7 +12,7 @@ def createGCSObject(bucket_name, source_file_name, destination_blob_name):
     return f"File {source_file_name} uploaded to {destination_blob_name}."
 
 
-def readGCSObject(bucket_name, source_blob_name):
+def read_gcs_object(bucket_name: str, source_blob_name: str):
     """Return a blob from a bucket in Google Cloud Storage."""
 
     storage_client = storage.Client()
@@ -23,7 +23,7 @@ def readGCSObject(bucket_name, source_blob_name):
     return contents
 
 
-def updateGCSObject(bucket_name, blob_name, new_name):
+def update_gcs_object(bucket_name: str, blob_name: str, new_name: str):
     """Renames a blob in Google Cloud Storage."""
 
     storage_client = storage.Client()
@@ -35,7 +35,7 @@ def updateGCSObject(bucket_name, blob_name, new_name):
     return f"Blob {blob.name} has been renamed to {new_blob.name}"
 
 
-def deleteGCSObject(bucket_name, blob_name):
+def delete_gcs_object(bucket_name: str, blob_name: str):
     """Deletes a blob from Google Cloud Storage."""
 
     storage_client = storage.Client()
@@ -46,7 +46,7 @@ def deleteGCSObject(bucket_name, blob_name):
     return f"Blob {blob_name} deleted."
 
 
-def createGCSBucket(bucket_name):
+def create_gcs_bucket(bucket_name: str):
     """Creates a bucket in Google Cloud Storage."""
 
     storage_client = storage.Client()
@@ -55,7 +55,7 @@ def createGCSBucket(bucket_name):
     return f"Bucket {bucket.name} created"
 
 
-def readGCSBucket(bucket_name):
+def read_gcs_bucket(bucket_name: str):
     """Returns all the blobs in a bucket Google Cloud Storage."""
 
     storage_client = storage.Client()
@@ -64,7 +64,7 @@ def readGCSBucket(bucket_name):
     return blobs
 
 
-def deleteGCSBucket(bucket_name):
+def delete_gcs_bucket(bucket_name: str):
     """Deletes a bucket in Google Cloud Stoage. The bucket must be empty."""
 
     storage_client = storage.Client()
