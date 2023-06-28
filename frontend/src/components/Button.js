@@ -1,7 +1,6 @@
 import React from "react";
 import { Button } from "@mui/material";
 import { Stack } from "@mui/material";
-// import * as teilwindcss "tailwindcss";
 
 const Buttons = () => {
   // Stack is a container component for arranging elements vertically or horizontally.
