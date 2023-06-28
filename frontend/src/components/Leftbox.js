@@ -1,79 +1,93 @@
-import React, { useState } from "react";
-import { Dropdown, Ripple, initTE } from "tw-elements";
-import { AiFillCaretUp, AiFillCaretDown } from "react-icons/ai";
-import { RxCross1 } from "react-icons/rx";
-import list from "./list.json";
+import React from "react";
 
-initTE({ Dropdown, Ripple });
+import Typography from '@mui/material/Typography';
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import FormControl from '@mui/material/FormControl';
+import Autocomplete from '@mui/material/Autocomplete';
+import Divider from '@mui/material/Divider';
+import TextField from '@mui/material/TextField';
+import Fab from '@mui/material/Fab';
+
+import DeleteIcon from '@mui/icons-material/Delete';
 
 function Leftbox() {
-  const [isOpen, setIsOpen] = useState(false);
+
+  const purposes = [
+    { label: 'Marketing' },
+    { label: 'Sales' },
+    { label: 'Admin' },
+    { label: 'Shipping' },
+    { label: 'Purchase' }
+  ]
+
   return (
-    // add some tailwindcss here ..
-    <div className="upload img h-screen">
-      <div className="relative grid grid-cols-2 gap-1 mt-5 h-[50vh] p-3 bg-sky-800 ml-8 mr-8">
-        <div className=" text-purple-100 p-5 w-full items-center justify-center border border-black rounded hover:bg-blue-100 font-mono transition duration-300 hover:text-black">
-          [here comes the img preview]
-        </div>
-        <div className="relative h-358 w-340">
-          <button
-            className="bg-red-600 h-8 w-8 flex justify-center items-center border-1 ml-2 rounded-full font-extrabold text-lg absolute bottom-0 left-0  hover:bg-red-700 shadow-lg"
-            type="button"
-          >
-            <RxCross1 className="" />
-          </button>
-        </div>
-      </div>
-      <div className="bg-sky-800 ml-8 mr-8">
-        <div className="shadow-lg hover:shadow-xl">
-          <label for="formFileLg" className=""></label>
-          <input
-            class="relative block w-full min-w-0 flex-auto cursor-pointer bg-clip-padding px-3 py-[0.32rem] font-sans tracking-wider leading-[2.15] text-purple-100 text-sm transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:cursor-pointer file:overflow-hidden file:px-3 file:py-[0.32rem] file:text-purple-100 file:font-sans file:tracking-wider file:text-base file:bg-sky-800 file:transition file:duration-150 file:ease-in-out file:[margin-inline-end:0.75rem] hover:file:bg-sky-500 "
-            id="formFileMultiple"
-            type="file"
-          />
-        </div>
-      </div>
-      <div className="relative grid grid-cols-2 gab-1 ml-8 mr-8 mt-2">
-        <div className="">
-          <button
-            className=" text-purple-100 justify-center  bg-green-700 h-8 w-28 border-1 rounded text font-sans tracking-wider hover:bg-green-700"
-            type="button"
-          >
-            Apply
-          </button>
-        </div>
-        <div className="relative flex flex-col items-center">
-          {/* add "active:" for when clicking  */}
-          <button
-            onClick={() => setIsOpen((prevState) => !prevState)}
-            className="text-lg font-sans text-purple-100 tracking-wider bg-sky-800 w-full flex justify-between p-2 h-8 items-center border-2 border-transparent active:border-purple-100 duration-75 active:text-white rounded-lg"
-          >
-            Select purpose
-            {!isOpen ? (
-              <AiFillCaretDown className="h-8" />
-            ) : (
-              <AiFillCaretUp className="h-8" />
-            )}
-          </button>
-          {isOpen && (
-            <div className="bg-sky-600 absolute mt-10 flex flex-col items-start rounded-lg p-2 w-full">
-              {/* map the json file list */}
-              {list.map((item, i) => (
-                <div
-                  className="flex w-full justify-between hover:bg-sky-500 cursor-pointer rounded-r-lg border-l-transparent hover:border-l-purple-100 border-l-4"
-                  key={i}
-                >
-                  <h3 className="text-purple-100 font-sans tracking-wider text-base ml-2">
-                    {item.purpose}
-                  </h3>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+    <Box sx={{ p: 5 }} >
+
+      <Typography variant="h4" gutterBottom>
+        Upload Data
+      </Typography>
+
+      <Typography variant="h5" gutterBottom>
+        Current Photo
+      </Typography>
+      <Avatar 
+            alt="Headshot" 
+            // src="https://placehold.co/128x128" 
+            src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=128&h=128&fit=crop&auto=format"
+            sx={{ width: 128, height: 128 }}  
+      />
+
+      <Divider sx={{ margin: '30px 0' }} />
+
+      <Typography variant="h5" gutterBottom>
+        Upload new Photo
+      </Typography>
+
+      <FormControl fullWidth>
+        <Button variant="outlined" color="inherit" component="label" sx={{ height: '56px' }}>
+          Choose Photo
+          <input type="file" hidden />
+        </Button>
+      </FormControl>
+
+      <FormControl sx={{ width: '48%', marginRight: '4%' }} margin="normal">
+        <Autocomplete
+          disablePortal
+          id="purpose"
+          freeSolo
+          multiple
+          options={purposes}
+          renderInput={(params) => <TextField {...params} label="Purpose" />}
+        />
+      </FormControl>
+
+      <FormControl sx={{ width: '48%' }} margin="normal">
+        <Autocomplete
+          disablePortal
+          id="purpose"
+          freeSolo
+          multiple
+          options={purposes}
+          renderInput={(params) => <TextField {...params} label="Limitation" />}
+        />
+      </FormControl>
+
+      <FormControl margin="normal">
+        <Fab color="primary" variant="extended" aria-label="add">
+          Upload new Photo
+        </Fab>
+      </FormControl>
+
+      <Divider sx={{ margin: '30px 0' }} />
+      <FormControl margin="normal">
+        <Fab color="error" variant="extended" aria-label="delete">
+          Delete current Photo
+          <DeleteIcon />
+        </Fab>
+      </FormControl>
+    </Box>
   );
 }
 
