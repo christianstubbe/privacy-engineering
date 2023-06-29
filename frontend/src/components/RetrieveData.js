@@ -103,9 +103,9 @@ export default function Rightbox() {
             label="limitation"
             onChange={handleLimitation}
           >
-            <MenuItem value={10}>Small Size</MenuItem>
-            <MenuItem value={20}>Medium Size</MenuItem>
-            <MenuItem value={30}>Blurred</MenuItem>
+            <MenuItem value={10}>Blurred</MenuItem>
+            <MenuItem value={20}>Downsized</MenuItem>
+            <MenuItem value={30}>Label Only</MenuItem>
           </Select>
         </FormControl>
 

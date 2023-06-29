@@ -1,6 +1,10 @@
-import CssBaseline from '@mui/material/CssBaseline';
+import * as React from "react";
 
-import { MainComponent } from "./components/Main";
+import CssBaseline from '@mui/material/CssBaseline';
+import { Grid, Container } from "@mui/material";
+
+import UploadData from "./components/UploadData";
+import RetrieveData from "./components/RetrieveData";
 import Navbar from "./components/Navbar.js";
 
 function App() {
@@ -8,7 +12,16 @@ function App() {
     <>
       <CssBaseline />
       <Navbar />
-      <MainComponent />
+      <Container maxWidth="lg">
+        <Grid container spacing={6}>
+          <Grid item xs={6}>
+            <UploadData/>
+          </Grid>
+          <Grid item xs={6}>
+            <RetrieveData />
+          </Grid>
+        </Grid>
+      </Container>
     </>
   );
 }
