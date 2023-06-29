@@ -1,8 +1,0 @@
-[
-  { "purpose": "Marketing" },
-  { "purpose": "Sales" },
-  { "purpose": "Admin" },
-  { "purpose": "Shipping" },
-  { "purpose": "Purchase" },
-  { "purpose": "etc..." }
-]
