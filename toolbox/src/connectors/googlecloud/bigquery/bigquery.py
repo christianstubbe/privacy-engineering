@@ -9,7 +9,7 @@ def query_bq(query: str):
     return query_job
 
 
-def create_bq_dataset(dataset_id: int, location: str):
+def create_bq_dataset(dataset_id: str, location: str):
     """Create a new dataset in BigQuery."""
     
     client = bigquery.Client()
@@ -20,7 +20,7 @@ def create_bq_dataset(dataset_id: int, location: str):
     return "Created dataset {}.{}".format(client.project, dataset.dataset_id)
 
 
-def delete_bq_dataset(dataset_id: int):
+def delete_bq_dataset(dataset_id: str):
     """Deletes a dataset in BigQuery."""
 
     client = bigquery.Client()
