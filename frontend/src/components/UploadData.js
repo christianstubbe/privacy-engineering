@@ -22,6 +22,12 @@ function Leftbox() {
     { label: 'Purchase' }
   ]
 
+  const limitations = [
+    {label: 'Blurred'},
+    {label: 'Label Only'},
+    {label: 'Downsized'}
+  ]
+
   return (
     <Box sx={{ p: 5 }} >
 
@@ -38,6 +44,9 @@ function Leftbox() {
             src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=128&h=128&fit=crop&auto=format"
             sx={{ width: 128, height: 128 }}  
       />
+        <Fab  sx={{ marginLeft: '70px', marginTop: '-34px' }} color="error" variant="extended" aria-label="delete">
+          <DeleteIcon />
+        </Fab>
 
       <Divider sx={{ margin: '30px 0' }} />
 
@@ -52,7 +61,7 @@ function Leftbox() {
         </Button>
       </FormControl>
 
-      <FormControl sx={{ width: '48%', marginRight: '4%' }} margin="normal">
+      <FormControl fullWidth margin="normal">
         <Autocomplete
           disablePortal
           id="purpose"
@@ -63,13 +72,13 @@ function Leftbox() {
         />
       </FormControl>
 
-      <FormControl sx={{ width: '48%' }} margin="normal">
+      <FormControl fullWidth margin="normal">
         <Autocomplete
           disablePortal
           id="purpose"
           freeSolo
           multiple
-          options={purposes}
+          options={limitations}
           renderInput={(params) => <TextField {...params} label="Limitation" />}
         />
       </FormControl>
@@ -80,13 +89,7 @@ function Leftbox() {
         </Fab>
       </FormControl>
 
-      <Divider sx={{ margin: '30px 0' }} />
-      <FormControl margin="normal">
-        <Fab color="error" variant="extended" aria-label="delete">
-          Delete current Photo
-          <DeleteIcon />
-        </Fab>
-      </FormControl>
+
     </Box>
   );
 }
