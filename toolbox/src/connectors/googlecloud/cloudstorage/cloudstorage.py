@@ -1,7 +1,7 @@
 from google.cloud import storage
 
 
-def create_gcs_object(bucket_name, source_file_name, destination_blob_name):
+def create_gcs_object(bucket_name: str, source_file_name: str, destination_blob_name: str):
     """Uploads a file to a Google Cloud Storage bucket."""
 
     storage_client = storage.Client()
