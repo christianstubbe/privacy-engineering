@@ -1,6 +1,6 @@
 from google.cloud import bigquery
 
-def queryBQ(query):
+def query_bq(query: str):
     """Executes a client query in BigQuery and returns the result."""
 
     client = bigquery.Client()
@@ -9,7 +9,7 @@ def queryBQ(query):
     return query_job
 
 
-def createBQDataset(dataset_id, location):
+def create_bq_dataset(dataset_id: str, location: str):
     """Create a new dataset in BigQuery."""
     
     client = bigquery.Client()
@@ -20,12 +20,12 @@ def createBQDataset(dataset_id, location):
     return "Created dataset {}.{}".format(client.project, dataset.dataset_id)
 
 
-def deleteBQDataset(dataset_id):
+def delete_bq_dataset(dataset_id: str):
     """Deletes a dataset in BigQuery."""
 
     client = bigquery.Client()
     client.delete_dataset(
         dataset_id, delete_contents=True, not_found_ok=True
-    )  
+    )
 
     return "Deleted dataset '{}'.".format(dataset_id)
