@@ -17,7 +17,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Our main process
-app = FastAPI()
+app = FastAPI(debug=True)
 
 app.add_middleware(AccessControlMiddleware)
 
@@ -37,3 +37,4 @@ def health_check():
 
 def entry_point(request: Request):
     logger.info(f"Serverless function was triggered! {request}")
+    return {"Hello from the entry_point function! 🚀 "}

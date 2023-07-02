@@ -1,6 +1,7 @@
-import casbin, logging
+import casbin
+import logging
 from fastapi import Request, HTTPException
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+from starlette.middleware.base import BaseHTTPMiddleware
 from exceptions.exceptions import InvalidPurposeException
 
 MODEL_PATH = "models/"
@@ -11,22 +12,18 @@ logger = logging.getLogger(__name__)
 
 class AccessControlMiddleware(BaseHTTPMiddleware):
     # Dependency to enforce access control
-    async def enforce_access_control(
-        self, request: Request, call_next: RequestResponseEndpoint
-    ):
+    async def dispatch(self, request, call_next):
         # TODO depending on the path, enforce a different
         model = request.headers.get("model")
         # Initialize Casbin enforcer with model and policy files
         # enforcer = create_enforcer()
-        enforcer = casbin.Enforcer("models/rbac_model.conf", "rules/rbac_policy.csv")
+        enforcer = casbin.Enforcer("./access/models/rbac_model.conf", "./access/rules/rbac_policy.csv")
         # Get the subject, object, and action from request headers (or any other source)
         sub = request.headers.get("subject")
         obj = request.headers.get("object")
         act = request.headers.get("action")
 
-        # Check if access is allowed using Casbin enforcer
-        if not enforcer.enforce(sub, obj, act):
-            raise InvalidPurposeException(act)
+        # TODO: Check if access is allowed using Casbin enforcer
 
         response = await call_next(request)
         return response
