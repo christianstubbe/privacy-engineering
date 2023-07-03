@@ -1,15 +1,19 @@
 import io
 from google.cloud import vision
 
-def label_detection(image_path: str) -> list:
+def label_detection(uri: str) -> list:
     """Detects labels in the file."""
     
-    # Prepare the img
-    image_path = image_path
-    with io.open(image_path, "rb") as image_file:
-        content = image_file.read()
+    # Prepare the img (from local image)
+    # image_path = image_path
+    # with io.open(image_path, "rb") as image_file:
+    #     content = image_file.read()
 
-    image = vision.Image(content=content)
+    # image = vision.Image(content=content)
+
+    # Prepare the img (from remote image)
+    image = vision.Image()
+    image.source.image_uri = uri
 
     # Instantiate a client
     client = vision.ImageAnnotatorClient()
