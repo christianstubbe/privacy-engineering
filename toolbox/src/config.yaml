@@ -1,0 +1,15 @@
+app_name: "acme_directory"
+purposes:
+    - _id: c76957fc-3448-4463-97e6-769d1ac93b32
+      purpose: marketing
+      transformations: 
+       - blur
+       - redact_email
+      exceptions: 
+       - market_research
+    - _id: d15f2caa-3616-48dc-b806-a71cab2a136c
+      purpose: research
+      transformations: 
+      - blur
+      exceptions: 
+       - research_industry

@@ -10,7 +10,8 @@
             "request": "launch",
             "module": "uvicorn",
             "args": [
-                "main:app"
+                "${workspaceFolder}/toolbox/src/main:app",
+                "--reload"
             ],
             "jinja": true,
             "justMyCode": true

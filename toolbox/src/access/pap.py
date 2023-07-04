@@ -1,21 +1,27 @@
 import logging
 from fastapi import APIRouter
 
-# import utils
-
-MODEL_PATH = "models/"
-RULE_PATH = "rules/"
-
 logger = logging.getLogger(__name__)
 
 pap_router = APIRouter()
+
+
+class PolicyAdministrationPoint:
+    def __init__(self):
+        pass
+
+
+pap = PolicyAdministrationPoint()
 
 
 @pap_router.get("/policy/list")
 def list_policies():
     pass
 
+# TODO: list policies
 
-class PolicyAdministrationPoint:
-    def __init__():
-        pass
+# TODO: upload policies
+
+# TODO: add a purpose
+
+# TODO: add an exception
