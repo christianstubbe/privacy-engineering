@@ -1,21 +1,20 @@
-
 resource "google_storage_bucket" "toolbox" {
   name            = "privacy-engineering-toolbox"
   location        = "EUROPE-WEST3"
-  force_destroy   = false
+  force_destroy   = true
 }
 
 # TODO @christianstubbe: Add hashsum to zip to enable Cloud Function Redeployment on source code change
 data "archive_file" "toolbox" {
   type            = "zip"
   output_path     = "/tmp/toolbox.zip"
-  source_dir      = "./../src/"
+  source_dir      = "./../toolbox/src/"
 }
 
 resource "google_storage_bucket_object" "toolbox" {
   name            = "toolbox.zip"
   bucket          = google_storage_bucket.toolbox.name
-  source          = data.archive_file.toolbox.output_path 
+  source          = data.archive_file.toolbox.output_path
 }
 
 resource "google_cloudfunctions2_function" "toolbox" {

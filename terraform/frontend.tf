@@ -8,7 +8,7 @@ resource "google_storage_bucket" "frontend" {
 resource "google_storage_bucket_object" "frontend" {
   name   = "frontend.zip"
   bucket = google_storage_bucket.frontend.name
-  source = "./../../frontend/build.zip"
+  source = "./../frontend/build.zip"
 }
 
 # TODO @christianstubbe: Refactor into Terraform State to prevent Error 409: This application already exists and cannot be re-created
