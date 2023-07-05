@@ -15,7 +15,6 @@ resource "google_storage_bucket_object" "toolbox" {
   name            = "toolbox.zip"
   bucket          = google_storage_bucket.toolbox.name
   source          = data.archive_file.toolbox.output_path
-  skip_destroy    = true
 }
 
 resource "google_cloudfunctions2_function" "toolbox" {
