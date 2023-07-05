@@ -9,7 +9,7 @@ resource "google_storage_bucket" "toolbox" {
 data "archive_file" "toolbox" {
   type            = "zip"
   output_path     = "/tmp/toolbox.zip"
-  source_dir      = "./../src/"
+  source_dir      = "./../toolbox/src/"
 }
 
 resource "google_storage_bucket_object" "toolbox" {
