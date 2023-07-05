@@ -1,5 +1,5 @@
 import logging
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from adapters.db import collection
 from typing import List
 import uuid
@@ -25,16 +25,10 @@ def is_valid_uuid(val):
         return False
 
 
-class PolicyAdministrationPoint:
-    def __init__(self):
-        pass
-
-
 class Purpose:
-    def __init__(self, name: str, parent_id: uuid, _id=uuid.uuid4(),
-                 exceptions=[""], transformations=[""]) -> None:
+    def __init__(self, name: str, parent_id="",
+                 exceptions=[""], transformations=[""]):
         self.purpose = name
-        self._id = _id
         self.parent_id = parent_id
         self.exceptions = exceptions
         self.transformations = transformations
@@ -44,6 +38,7 @@ class Purpose:
             self.exceptions.append(purpose_id)
 
 
+# TODO: replace function with ** op
 def cast_purpose(obj) -> Purpose:
     return Purpose(
         obj["name"],
@@ -54,24 +49,26 @@ def cast_purpose(obj) -> Purpose:
     )
 
 
-@pap_router.post("/purpose/add/{purpose_name}")
+@pap_router.get("/purpose/add/{purpose_name}", status_code=200)
 def add_purpose(purpose_name: str):
+    if collection.find_one({"purpose": purpose_name}):
+        raise HTTPException(status_code=400, detail="A purpose with that name already exists.")
     purpose = Purpose(purpose_name)
-    collection.insert_one(purpose)
+    purpose_dict = vars(purpose)
+    collection.insert_one(purpose_dict)
     logger.info(f"Added new purpose: {purpose_name}")
+    return {"result": "success"}
 
 
-@pap_router.get("/purpose/list/")
+@pap_router.get("/purpose/list")
 def list_purposes():
-    purpose = Purpose(purpose_name)
-    collection.insert_one(purpose)
-    logger.info(f"Added new purpose: {purpose_name}")
+    return collection.find()
 
 
-@pap_router.post("/exceptions/add/")
+@pap_router.post("/exceptions/add")
 def add_exception(item: Item):
-    items_dict = item.dict()
-    purpose_name = items_dict["purpose_name"]
+    items_dict = item.dict()  # Request body
+    purpose_name = items_dict["purpose"]
     exception = items_dict["exception"]
     purpose = cast_purpose(collection.find_one({purpose_name}))
     purpose.add_exception(exception)
