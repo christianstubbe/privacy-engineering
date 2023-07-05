@@ -9,8 +9,9 @@
             "type": "python",
             "request": "launch",
             "module": "uvicorn",
+            "cwd": "${workspaceFolder}/toolbox/src",
             "args": [
-                "${workspaceFolder}/toolbox/src/main:app",
+                "main:app",
                 "--reload"
             ],
             "jinja": true,
