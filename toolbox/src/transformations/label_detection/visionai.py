@@ -3,13 +3,6 @@ from google.cloud import vision
 
 def label_detection(uri: str) -> list:
     """Detects labels in the file."""
-    
-    # Prepare the img (from local image)
-    # image_path = image_path
-    # with io.open(image_path, "rb") as image_file:
-    #     content = image_file.read()
-
-    # image = vision.Image(content=content)
 
     # Prepare the img (from remote image)
     image = vision.Image()
@@ -25,14 +18,14 @@ def label_detection(uri: str) -> list:
     for label in labels:
         # print(label.description)
         lab_list.append(label.description)
-    
+
     if response_label.error.message:
         raise Exception(
             "{}\nFor more info on error messages,check: "
             "https://cloud.google.com/apis/design/errors".format(response_label.error.message)
         )
-    
-    print(lab_list)
+
+    # print(lab_list)
     return lab_list
 
 
