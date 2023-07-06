@@ -1,6 +1,6 @@
 import logging
 from fastapi import APIRouter, HTTPException
-from adapters.db import collection
+from utils.db import collection
 from typing import List
 import uuid
 import os
@@ -49,7 +49,7 @@ def cast_purpose(obj) -> Purpose:
     )
 
 
-@pap_router.get("/purpose/add/{purpose_name}", status_code=200)
+@pap_router.post("/purpose/add/{purpose_name}", status_code=200)
 def add_purpose(purpose_name: str):
     if collection.find_one({"purpose": purpose_name}):
         raise HTTPException(status_code=400, detail="A purpose with that name already exists.")
@@ -62,7 +62,19 @@ def add_purpose(purpose_name: str):
 
 @pap_router.get("/purpose/list")
 def list_purposes():
-    return collection.find()
+    cursor = collection.find({}, {'_id': 0})
+    documents = list(cursor)
+    if len(documents) == 0:
+        raise HTTPException(status_code=404, detail="No purpose exists in the collection.")
+    return documents
+
+
+@pap_router.get("/purpose/{id}")
+def get_purpose(id: str):
+    document = collection.find_one({"_id": id})
+    if document is None:
+        raise HTTPException(status_code=404, detail=f"No purpose found with that ID: {id}")
+    return document
 
 
 @pap_router.post("/exceptions/add")

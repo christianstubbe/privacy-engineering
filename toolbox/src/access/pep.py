@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 # from exceptions.exceptions import InvalidPurposeException
 
-from adapters.mongodb import adapter
+from adapters.mongo_casbin import adapter
 
 logger = logging.getLogger(__name__)
 

@@ -3,6 +3,7 @@ This class provides an interface for Casbin to use the custom,
 provided model for our data structure.
 """
 import casbin_pymongo_adapter
+from utils import constants
 
 
 # TODO: are policies saved diffirently depending on
@@ -20,4 +21,4 @@ class PyMongoAdapter(casbin_pymongo_adapter.Adapter):
         pass
 
 
-adapter = PyMongoAdapter("mongodb://localhost:27017/", "pbac_db")
+adapter = PyMongoAdapter(constants.MONGODB_URL, constants.COLLECTION_NAME)
