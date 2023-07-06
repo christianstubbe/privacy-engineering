@@ -1,4 +1,5 @@
-app_name: "acme_directory"
+appName: "acme_directory"
+logoUrl: ""
 purposes:
     - _id: c76957fc-3448-4463-97e6-769d1ac93b32
       purpose: marketing

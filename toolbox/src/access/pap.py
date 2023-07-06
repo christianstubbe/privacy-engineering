@@ -73,6 +73,7 @@ def add_exception(item: Item):
     purpose = cast_purpose(collection.find_one({purpose_name}))
     purpose.add_exception(exception)
     logger.info(f"Added new exception for purpose: {purpose_name}")
+    return collection.find_one({"exceptions": exception})
 
 
 @pap_router.get("/policies/list", response_model=List[str])
