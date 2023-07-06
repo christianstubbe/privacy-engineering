@@ -1,6 +1,10 @@
-python-dotenv==0.19.0
 fastapi==0.97.0
 casbin==1.19.0
 uvicorn[standard]
 pytest==7.3.2
 google-cloud-storage==2.9.0
+pymongo
+casbin_pymongo_adapter
+pyyaml 
+jsonschema
+pydantic
