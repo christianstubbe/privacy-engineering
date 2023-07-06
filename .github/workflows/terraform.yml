@@ -13,12 +13,10 @@ jobs:
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
+        working-directory: ./terraform
         shell: bash
 
     steps:
-    - name: Change Folder
-      run: cd terraform
-
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
       uses: actions/checkout@v2

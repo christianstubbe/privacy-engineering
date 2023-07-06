@@ -5,7 +5,6 @@ import logging
 from access.pep import AccessControlMiddleware
 
 # Router
-from api.storage import cloud_router
 from access.pap import pap_router
 
 # Configure app-wide logging
@@ -17,11 +16,10 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Our main process
-app = FastAPI()
+app = FastAPI(debug=True)
 
 app.add_middleware(AccessControlMiddleware)
 
-app.include_router(cloud_router, prefix="/api/v1")
 app.include_router(pap_router, prefix="/api/v1")
 
 
@@ -37,3 +35,4 @@ def health_check():
 
 def entry_point(request: Request):
     logger.info(f"Serverless function was triggered! {request}")
+    return {"Hello from the entry_point function! 🚀 "}
