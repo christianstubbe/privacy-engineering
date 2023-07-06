@@ -6,9 +6,9 @@ resource "google_storage_bucket" "frontend" {
 
 # TODO @christianstubbe: Refactor zip creation with GitHub Actions to automate npm run build
 resource "google_storage_bucket_object" "frontend" {
-  name   = "frontend.zip"
+  name   = "frontend/"
   bucket = google_storage_bucket.frontend.name
-  source = "./../frontend/build.zip"
+  source = "./../frontend/build/"
 }
 
 # TODO @christianstubbe: Refactor into Terraform State to prevent Error 409: This application already exists and cannot be re-created
