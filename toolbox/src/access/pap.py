@@ -1,6 +1,6 @@
 import logging
 from fastapi import APIRouter, HTTPException
-from utils.db import collection
+from db import collection
 from typing import List
 import uuid
 import os
@@ -38,16 +38,6 @@ class Purpose:
             self.exceptions.append(purpose_id)
 
 
-# TODO: replace function with ** op
-def cast_purpose(obj) -> Purpose:
-    return Purpose(
-        obj["name"],
-        obj["parent_id"],
-        obj["exceptions"],
-        obj["transformations"]
-    )
-
-
 @pap_router.post("/purpose/add/{purpose_name}", status_code=200)
 def add_purpose(purpose_name: str):
     if collection.find_one({"purpose": purpose_name}):
@@ -82,7 +72,7 @@ def add_exception(item: Item):
     items_dict = item.dict()  # Request body
     purpose_name = items_dict["purpose"]
     exception = items_dict["exception"]
-    purpose = cast_purpose(collection.find_one({purpose_name}))
+    purpose = Purpose(**collection.find_one({purpose_name}))
     purpose.add_exception(exception)
     logger.info(f"Added new exception for purpose: {purpose_name}")
     return collection.find_one({"exceptions": exception})

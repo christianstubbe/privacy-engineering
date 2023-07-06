@@ -15,12 +15,12 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.ERROR)
+logger.setLevel(logging.DEBUG)
 
 # Our main process
 app = FastAPI(debug=True)
 
-app.include_router(pap_router, prefix="/api/v1")
+app.include_router(pap_router, prefix="/api/v1/pap")
 app.include_router(gcp_router, prefix="/api/v1/gcp", dependencies=[Depends(control_access())])
 
 

@@ -1,5 +1,6 @@
+""" This package for querying and uploading data to different cloud data storage solutions. """
 from pymongo import MongoClient
-from utils import constants
+import constants
 
 client = MongoClient(constants.MONGODB_URL,
                      uuidRepresentation="standard")

@@ -3,7 +3,7 @@ This class provides an interface for Casbin to use the custom,
 provided model for our data structure.
 """
 import casbin_pymongo_adapter
-from utils import constants
+import constants
 
 
 # TODO: are policies saved diffirently depending on

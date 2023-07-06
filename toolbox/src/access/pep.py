@@ -1,13 +1,14 @@
 import casbin
 import logging
 from fastapi import HTTPException, Request
-from .adapters.mongo import adapter
+from access.adapters.mongo import adapter
 
 logger = logging.getLogger(__name__)
 
 
 def control_access():
     def _middleware(request: Request):
+        logger.error(f"Middleware intercepted the request to {request.url}")
         model = request.path_params.get("model")
         # Initialize Casbin enforcer with model and policy files
         # enforcer = create_enforcer()
@@ -15,13 +16,12 @@ def control_access():
             "./access/models/rbac_model.conf", adapter
         )
         # Get the subject, object, and action from request headers (or any other source)
-        sub = request.path_params.get("subject")
-        obj = request.path_params.get("object")
-        act = request.path_params.get("action")
+        sub = request.query_params.get("subject")
+        obj = request.query_params.get("object")
+        act = request.query_params.get("action")
 
         if not enforcer.enforce(sub, obj, act):
-            pass
-            # raise HTTPException(status_code=403, detail="Access denied")
+            raise HTTPException(status_code=403, detail="Access denied")
         return request
 
     return _middleware

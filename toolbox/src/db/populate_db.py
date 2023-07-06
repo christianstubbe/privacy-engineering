@@ -1,12 +1,8 @@
-from pymongo import MongoClient
+from . import collection
 from schema import validate_schema
 from access.pap import Purpose
 import constants
 import logging
-
-client = MongoClient(constants.MONGODB_URL)
-db = client[constants.DB_NAME]
-collection = db[constants.COLLECTION_NAME]
 
 
 logger = logging.getLogger(__name__)
