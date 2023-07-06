@@ -42,7 +42,6 @@ class Purpose:
 def cast_purpose(obj) -> Purpose:
     return Purpose(
         obj["name"],
-        obj["_id"],
         obj["parent_id"],
         obj["exceptions"],
         obj["transformations"]
@@ -62,6 +61,7 @@ def add_purpose(purpose_name: str):
 
 @pap_router.get("/purpose/list")
 def list_purposes():
+    # https://stackoverflow.com/questions/63881516/objectid-object-is-not-iterable-error-while-fetching-data-from-mongodb-atlas
     cursor = collection.find({}, {'_id': 0})
     documents = list(cursor)
     if len(documents) == 0:

@@ -3,6 +3,7 @@ casbin==1.19.0
 uvicorn[standard]
 pytest==7.3.2
 google-cloud-storage==2.9.0
+google-cloud-bigquery==3.11.3
 pymongo
 casbin_pymongo_adapter
 pyyaml 

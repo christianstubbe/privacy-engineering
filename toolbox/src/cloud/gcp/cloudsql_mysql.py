@@ -1,7 +1,8 @@
 from google.cloud.sql.connector import Connector
 import sqlalchemy
 
-def initialize_cloudsql(project:str, region: str, instance: str, user:str, password:str, db: str) -> Connector:
+
+def initialize_cloudsql(project: str, region: str, instance: str, user: str, password: str, db: str) -> Connector:
     """Initializes and returns a connection with Cloud SQL."""
 
     connector = Connector()
@@ -14,6 +15,7 @@ def initialize_cloudsql(project:str, region: str, instance: str, user:str, passw
     )
 
     return conn
+
 
 def execute_cloudsql(statement: str):
     """Executes a query in Cloud SQL and returns the result."""
@@ -31,5 +33,5 @@ def execute_cloudsql(statement: str):
     return result
 
 
-def close_cloudsql(connector:Connector) -> None:
+def close_cloudsql(connector: Connector) -> None:
     connector.close()

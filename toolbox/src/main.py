@@ -1,11 +1,12 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 import logging
 
 # Middleware
-from access.pep import AccessControlMiddleware
+from access.pep import control_access
 
 # Router
 from access.pap import pap_router
+from cloud.gcp import gcp_router
 
 # Configure app-wide logging
 # N.B.: logs are automatically handle by the built-in interface of the cloud provider
@@ -14,25 +15,22 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.ERROR)
 
 # Our main process
 app = FastAPI(debug=True)
 
-app.add_middleware(AccessControlMiddleware)
-
 app.include_router(pap_router, prefix="/api/v1")
+app.include_router(gcp_router, prefix="/api/v1/gcp", dependencies=[Depends(control_access())])
 
 
 @app.get("/")
-def hello_world():
-    return {"message": "hello, world!"}
-
-
 @app.get("/health")
 def health_check():
     return {"status": "healthy"}
 
 
+# This function is for the cloud provider
 def entry_point(request: Request):
     logger.info(f"Serverless function was triggered! {request}")
     return {"Hello from the entry_point function! 🚀 "}
