@@ -1,13 +1,13 @@
 import cv2
-import urllib.request
 import numpy as np
+from PIL import Image
 
-def blur(uri: str):
+
+def blur(image: Image):
     """It returs a blurred version of the input image"""
 
     # decode uri in img
-    uri_response = urllib.request.urlopen(uri)
-    img_array = np.array(bytearray(uri_response.read()), dtype=np.uint8)
+    img_array = np.array(image, dtype=np.uint8)
     img = cv2.imdecode(img_array, 1)
 
     # median blurring
