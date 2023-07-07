@@ -1,13 +1,13 @@
 import cv2
-import urllib.request
+import io
+from PIL import Image
 import numpy as np
 
-def remove_background(uri: str):
+
+def remove_background(image: Image):
     """It returs the version of the input image without background"""
 
-    # decode uri in img
-    uri_response = urllib.request.urlopen(uri)
-    img_array = np.array(bytearray(uri_response.read()), dtype=np.uint8)
+    img_array = np.array(image, dtype=np.uint8)
     img = cv2.imdecode(img_array, 1)
 
     # calculates the h and w of the img
@@ -36,4 +36,3 @@ def remove_background(uri: str):
     # scv2.imshow("Result Image", result)
 
     return result
-
