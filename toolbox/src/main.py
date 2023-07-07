@@ -1,5 +1,8 @@
-from fastapi import FastAPI, Request, Depends
 import logging
+from dotenv import load_dotenv
+from fastapi import FastAPI, Request, Depends
+
+load_dotenv()
 
 # Middleware
 from access.pep import control_access
@@ -7,6 +10,8 @@ from access.pep import control_access
 # Router
 from access.pap import pap_router
 from cloud.gcp import gcp_router
+
+from access import db
 
 # Configure app-wide logging
 # N.B.: logs are automatically handle by the built-in interface of the cloud provider
