@@ -1,12 +1,8 @@
-import casbin
+from . import enforcer
 import logging
 from fastapi import HTTPException, Request
-from access.adapters.sqlalchemy import adapter
 
 logger = logging.getLogger(__name__)
-
-model = "rbac"
-enforcer = casbin.Enforcer(f"./access/models/{model}_model.conf", adapter)
 
 
 def control_access():
