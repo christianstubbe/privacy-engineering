@@ -1,81 +1,65 @@
 import logging
 from fastapi import APIRouter, HTTPException
-from adapters.db import collection
-from typing import List
-import uuid
-import os
+from . import enforcer as e
+from access.db import session_scope, Purposes
 from pydantic import BaseModel
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
 pap_router = APIRouter()
 
 
-class Item(BaseModel):
-    purpose_name: str
-    exception: str
-    description: str | None = None
+class PurposeIn(BaseModel):
+    name: str
+    # exceptions: Optional[list[str]] = [""]
+    # transformations: Optional[list[str]] = [""]
 
 
-def is_valid_uuid(val):
-    try:
-        uuid.UUID(str(val))
-        return True
-    except ValueError:
-        return False
+class ListHandler(logging.Handler):
+    def __init__(self, log_list):
+        super().__init__()
+        self.log_list = log_list
+
+    def emit(self, record):
+        # Record is a LogRecord object, whose attribute 'msg' contains the log message
+        self.log_list.append(record.msg)
 
 
-class Purpose:
-    def __init__(self, name: str, parent_id="",
-                 exceptions=[""], transformations=[""]):
-        self.purpose = name
-        self.parent_id = parent_id
-        self.exceptions = exceptions
-        self.transformations = transformations
-
-    def add_exception(self, purpose_id: str):
-        if is_valid_uuid(purpose_id):
-            self.exceptions.append(purpose_id)
-
-
-# TODO: replace function with ** op
-def cast_purpose(obj) -> Purpose:
-    return Purpose(
-        obj["name"],
-        obj["_id"],
-        obj["parent_id"],
-        obj["exceptions"],
-        obj["transformations"]
-    )
+@pap_router.post("/purpose/{purpose_name}", status_code=200)
+async def add_purpose(purpose: PurposeIn):
+    purpose_dict = purpose.dict()
+    with session_scope() as session:
+        purpose = Purposes(**purpose_dict)
+        try:
+            query = session.add(purpose)
+        except Exception as exc:
+            raise HTTPException(detail=f"A purpose with that name already exists. {exc.pgerror}", status_code=405)
+        # last_record_id = await database.execute(query)
+        logger.info(f"Added new purpose: {purpose_dict['name']}")
+        return {**purpose_dict, "id": 0}
 
 
-@pap_router.get("/purpose/add/{purpose_name}", status_code=200)
-def add_purpose(purpose_name: str):
-    if collection.find_one({"purpose": purpose_name}):
-        raise HTTPException(status_code=400, detail="A purpose with that name already exists.")
-    purpose = Purpose(purpose_name)
-    purpose_dict = vars(purpose)
-    collection.insert_one(purpose_dict)
-    logger.info(f"Added new purpose: {purpose_name}")
-    return {"result": "success"}
-
-
-@pap_router.get("/purpose/list")
+@pap_router.get("/purposes")
 def list_purposes():
-    return collection.find()
+    with session_scope() as session:
+        purposes = session.query(Purposes).all()
+        return purposes
 
 
-@pap_router.post("/exceptions/add")
-def add_exception(item: Item):
+@pap_router.get("/policy")
+def get_policy():
+    log_list = []
+    handler = ListHandler(log_list)
+    logger.addHandler(handler)
+    e.model.print_policy()
+    logger.removeHandler(handler)
+    return log_list
+
+
+@pap_router.put("/exception")
+def add_exception(item):
     items_dict = item.dict()  # Request body
     purpose_name = items_dict["purpose"]
-    exception = items_dict["exception"]
-    purpose = cast_purpose(collection.find_one({purpose_name}))
-    purpose.add_exception(exception)
     logger.info(f"Added new exception for purpose: {purpose_name}")
 
-
-@pap_router.get("/policies/list", response_model=List[str])
-def list_policies():
-    directory = './access/models'
-    return os.listdir(directory)

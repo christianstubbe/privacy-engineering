@@ -1,37 +1,28 @@
-import casbin
+from . import enforcer
 import logging
-from fastapi import HTTPException
-from starlette.middleware.base import BaseHTTPMiddleware
-# from exceptions.exceptions import InvalidPurposeException
-
-from adapters.mongodb import adapter
+from fastapi import Request
+from exceptions import InvalidPurposeException
+from PIL import Image
+from utils import calculate_image_hash
 
 logger = logging.getLogger(__name__)
 
 
-class AccessControlMiddleware(BaseHTTPMiddleware):
-    # Dependency to enforce access control
-    async def dispatch(self, request, call_next):
-        # TODO depending on the path, enforce a different
-        model = request.headers.get("model")
-        # Initialize Casbin enforcer with model and policy files
-        # enforcer = create_enforcer()
-        enforcer = casbin.Enforcer(
-            "./access/models/rbac_model.conf", adapter
-        )
-        # Get the subject, object, and action from request headers (or any other source)
-        sub = request.headers.get("subject")
-        obj = request.headers.get("object")
-        act = request.headers.get("action")
+def control_access():
+    def _middleware(request: Request):
+        sub = request.query_params.get("subject")
+        obj = request.query_params.get("object")
+        act = request.query_params.get("action")
+        purp = request.query_params.get("purpose")
 
-        enforcer.enforce(sub, obj, act)
+        if not enforcer.enforce(sub, obj, act, purp):
+            raise InvalidPurposeException(purp)
+        return request
 
-        response = await call_next(request)
-        return response
+    return _middleware
 
-    def create_enforcer(self, model: str):
-        if not ["abac", "pbac", "rbac"] in model:
-            raise HTTPException(status_code=400, detail="Bad Request")
-        return casbin.Enforcer(
-            f"models/{model}_model.conf", f"rules/{model}_rules.conf"
-        )
+
+def tag_content(content: Image, sub: str = None, act: str = None, purp: str = None):
+    obj = calculate_image_hash(content)
+    logger.info(f"Adding a new policy rule with sub: {sub}, obj: {obj}, act: {act}, purp: {purp}")
+    enforcer.add_policy(sub, obj, act, purp)

@@ -1,18 +1,18 @@
-import re
-
-# TODO: parse the purpose config from a bucket
-
-# TODO: redact text based on sensitive sequences in the output of a query to a database
-
-# TODO: remove background from profile pictures retrieved from cloud storage solutions
+import hashlib
+from io import BytesIO
+from PIL import Image
 
 
-def redact_email(text):
-    return re.sub(
-        r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}",
-        "[REDACTED_EMAIL]", text
-    )
+def calculate_image_hash(image: Image) -> str:
+    with BytesIO() as output:
+        image.save(output, format='JPEG')
+        data = output.getvalue()
+    hash_object = hashlib.sha256(data)
+    hex_dig = hash_object.hexdigest()
+    return hex_dig
 
 
-def redact_phone_number(text):
-    return re.sub(r"\b\d{10}\b", "[REDACTED_PHONE]", text)
+def get_bytes(img: Image, format='JPEG'):
+    byte_arr = BytesIO()
+    img.save(byte_arr, format)
+    return byte_arr.getvalue().replace(b'\0', b'')
