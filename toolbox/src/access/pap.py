@@ -1,13 +1,19 @@
 import logging
-from fastapi import APIRouter
-import hashlib
+from fastapi import APIRouter, HTTPException
 from . import enforcer as e
-from access.db import database, session_scope, Purpose
+from access.db import session_scope, Purposes
+from pydantic import BaseModel
+from typing import Optional
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 pap_router = APIRouter()
+
+
+class PurposeIn(BaseModel):
+    name: str
+    # exceptions: Optional[list[str]] = [""]
+    # transformations: Optional[list[str]] = [""]
 
 
 class ListHandler(logging.Handler):
@@ -21,17 +27,23 @@ class ListHandler(logging.Handler):
 
 
 @pap_router.post("/purpose/{purpose_name}", status_code=200)
-async def add_purpose(purpose_name: str):
+async def add_purpose(purpose: PurposeIn):
+    purpose_dict = purpose.dict()
     with session_scope() as session:
-        query = session.insert(Purpose).values(name=purpose_name)
-        last_record_id = await database.execute(query)
-        logger.info(f"Added new purpose: {purpose_name}")
+        purpose = Purposes(**purpose_dict)
+        try:
+            query = session.add(purpose)
+        except Exception as exc:
+            raise HTTPException(detail=f"A purpose with that name already exists. {exc.pgerror}", status_code=405)
+        # last_record_id = await database.execute(query)
+        logger.info(f"Added new purpose: {purpose_dict['name']}")
+        return {**purpose_dict, "id": 0}
 
 
-@pap_router.get("/purpose")
+@pap_router.get("/purposes")
 def list_purposes():
     with session_scope() as session:
-        purposes = session.query(Purpose).all()
+        purposes = session.query(Purposes).all()
         return purposes
 
 
@@ -51,12 +63,3 @@ def add_exception(item):
     purpose_name = items_dict["purpose"]
     logger.info(f"Added new exception for purpose: {purpose_name}")
 
-
-def tag_content(content, purpose: str):
-    my_list_as_bytes = str(content).encode()
-    my_hash = hashlib.sha256(my_list_as_bytes)
-    sub = ""
-    obj = my_hash
-    act = ""
-    purp = purpose
-    e.add_policy(sub, obj, act, purpose)

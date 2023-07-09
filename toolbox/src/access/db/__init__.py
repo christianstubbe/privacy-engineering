@@ -34,28 +34,28 @@ def session_scope():
 meta = MetaData()
 
 Base = declarative_base()
-
-
-class Purpose(Base):
-    __tablename__ = "purpose"
+    
+    
+class Purposes(Base):
+    __tablename__ = "purposes"
     id = Column(Integer, primary_key=True)
     name = Column(String(100), nullable=False, unique=True)
     # Column("parent_id", Integer, ForeignKey('tree.id')),
     # relationship("parent", 'Tree', remote_side=[id])
 
 
-class PurposeException(Base):
-    __tablename__ = "purpose_exception"
+class Exceptions(Base):
+    __tablename__ = "exceptions"
     id = Column(Integer, primary_key=True)
     name = Column(String(100), unique=True)
-    purpose_id = Column(Integer, ForeignKey('purpose.id'))
+    purpose_id = Column(Integer, ForeignKey('purposes.id'))
     exception_list = Column(String(100))
 
 
-class Transformation(Base):
-    __tablename__ = "transformation"
+class Transformations(Base):
+    __tablename__ = "transformations"
     id = Column(Integer, primary_key=True)
-    name = Column(Integer, ForeignKey('purpose.id'), unique=True)
+    name = Column(Integer, ForeignKey('purposes.id'), unique=True)
     transformation_list = Column("transformation_list", String(100))
 
 

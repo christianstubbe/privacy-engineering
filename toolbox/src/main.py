@@ -23,19 +23,22 @@ logger.setLevel(logging.DEBUG)
 app = FastAPI(debug=True)
 
 app.include_router(pap_router, prefix="/api/v1/pap")
-app.include_router(gcp_router, prefix="/api/v1/gcp", dependencies=[Depends(control_access())])
+app.include_router(gcp_router, prefix="/api/v1/gcp")
+# app.include_router(gcp_router, prefix="/api/v1/gcp", dependencies=[Depends(control_access())])
 
 
 @app.on_event("startup")
 async def startup():
     from access.db import database
     await database.connect()
+    logger.info("Connected to the database!")
 
 
 @app.on_event("shutdown")
 async def shutdown():
     from access.db import database
     await database.disconnect()
+    logger.info("Disconnected from the database!")
 
 
 @app.get("/")

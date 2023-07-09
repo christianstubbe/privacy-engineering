@@ -2,6 +2,8 @@ from . import enforcer
 import logging
 from fastapi import Request
 from exceptions import InvalidPurposeException
+from PIL import Image
+from utils import calculate_image_hash
 
 logger = logging.getLogger(__name__)
 
@@ -18,3 +20,9 @@ def control_access():
         return request
 
     return _middleware
+
+
+def tag_content(content: Image, sub: str = None, act: str = None, purp: str = None):
+    obj = calculate_image_hash(content)
+    logger.info(f"Adding a new policy rule with sub: {sub}, obj: {obj}, act: {act}, purp: {purp}")
+    enforcer.add_policy(sub, obj, act, purp)
