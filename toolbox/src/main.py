@@ -1,12 +1,10 @@
-import logging
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request, Depends
-
 load_dotenv()
 
+import logging
+from fastapi import FastAPI, Request, Depends
 # Middleware
 from access.pep import control_access
-
 # Router
 from access.pap import pap_router
 from cloud.gcp import gcp_router
@@ -25,6 +23,18 @@ app = FastAPI(debug=True)
 
 app.include_router(pap_router, prefix="/api/v1/pap")
 app.include_router(gcp_router, prefix="/api/v1/gcp", dependencies=[Depends(control_access())])
+
+
+@app.on_event("startup")
+async def startup():
+    from access.db import database
+    await database.connect()
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    from access.db import database
+    await database.disconnect()
 
 
 @app.get("/")
