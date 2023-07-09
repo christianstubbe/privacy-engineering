@@ -33,8 +33,8 @@ def list_purposes():
     with session_scope() as session:
         purposes = session.query(Purpose).all()
         return purposes
-    
-    
+
+
 @pap_router.get("/policy")
 def get_policy():
     log_list = []

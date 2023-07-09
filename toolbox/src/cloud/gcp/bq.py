@@ -3,7 +3,7 @@ import logging
 from . import gcp_router, credentials
 
 logger = logging.getLogger(__name__)
-client = bigquery.Client(credentials=credentials, 
+client = bigquery.Client(credentials=credentials,
                          project="tu-berlin-privacy-engineering")
 
 
@@ -39,4 +39,3 @@ def delete_bq_dataset(dataset_id: str) -> str:
     client.delete_dataset(dataset_id, delete_contents=True, not_found_ok=True)
     logger.info("Deleted dataset '{dataset_id}'.")
     return {"result": "success"}
-

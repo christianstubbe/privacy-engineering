@@ -8,7 +8,6 @@ from contextlib import contextmanager
 from databases import Database
 import uuid
 
-
 username = os.getenv("DB_USERNAME")
 password = os.getenv("DB_PASSWORD")
 url = os.getenv("DB_URL")
@@ -69,5 +68,5 @@ def populate():
     """
     Populate the database with basic information (purposes, exceptions, transformations, ...) provided by the config file
     """
-    
+
     pass
