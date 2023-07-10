@@ -1,10 +1,9 @@
 import React from "react";
 
+import { useState } from "react";
+
 import Box from '@mui/material/Box';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import Fab from '@mui/material/Fab';
@@ -15,18 +14,27 @@ import ImageListItem from '@mui/material/ImageListItem';
 import Divider from '@mui/material/Divider';
 
 export default function Rightbox() {
-  const [limitation, setLimitation] = React.useState('');
 
-  const handleLimitation = (event) => {
-    setLimitation(event.target.value);
-  };
+  const [isOpen, setIsOpen] = useState(false);
 
+  function toggle() {
+    setIsOpen((isOpen) => !isOpen);
+  }
+  
   const purposes = [
-    { label: 'Marketing' },
     { label: 'Sales' },
-    { label: 'Admin' },
-    { label: 'Shipping' },
-    { label: 'Purchase' }
+    { label: 'Microsoft 365' },
+    { label: 'LinkedIn' },
+    { label: 'Marketing' },
+    { label: 'Marketing – Offline' },
+    { label: 'Marketing – Online' },
+  ]
+
+  const transformations = [
+    {label: 'Blurred'},
+    {label: 'Label Only'},
+    {label: 'Downsized'},
+    {label: 'Without Background'}
   ]
 
   const itemData = [
@@ -96,21 +104,21 @@ export default function Rightbox() {
           />
       </FormControl>
 
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Limitation</InputLabel>
-          <Select
-            value={limitation}
-            label="limitation"
-            onChange={handleLimitation}
-          >
-            <MenuItem value={10}>Blurred</MenuItem>
-            <MenuItem value={20}>Downsized</MenuItem>
-            <MenuItem value={30}>Label Only</MenuItem>
-          </Select>
-        </FormControl>
+      <FormControl fullWidth margin="normal">
+        <Autocomplete
+          disablePortal
+          id="transformation"
+          freeSolo
+          multiple
+          options={transformations}
+          renderInput={(params) => <TextField {...params} label="Data Transformation" />}
+        />
+      </FormControl>
 
         <FormControl margin="normal">
-          <Fab color="primary" variant="extended" aria-label="add">
+          <Fab 
+            onClick={toggle}
+            color="primary" variant="extended" aria-label="add">
             Load Images
             <SearchIcon />
           </Fab>
@@ -122,7 +130,8 @@ export default function Rightbox() {
           Results
         </Typography>
 
-        <ImageList sx={{ width: 500, height: 450 }} cols={3} rowHeight={164}>
+
+        {isOpen && <ImageList sx={{ width: 500, height: 450 }} cols={3} rowHeight={164}>
           {itemData.map((item) => (
             <ImageListItem key={item.img}>
               <img
@@ -133,9 +142,9 @@ export default function Rightbox() {
               />
             </ImageListItem>
           ))}
-        </ImageList>
-    </Box> 
-  );
+        </ImageList>}
 
-  
+    </Box> 
+  );  
 }
+

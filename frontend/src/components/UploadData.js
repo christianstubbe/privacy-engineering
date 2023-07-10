@@ -15,17 +15,26 @@ import DeleteIcon from '@mui/icons-material/Delete';
 function Leftbox() {
 
   const purposes = [
-    { label: 'Marketing' },
     { label: 'Sales' },
-    { label: 'Admin' },
-    { label: 'Shipping' },
-    { label: 'Purchase' }
+    { label: 'Microsoft 365' },
+    { label: 'LinkedIn' },
+    { label: 'Marketing' },
+    { label: 'Marketing – Offline' },
+    { label: 'Marketing – Online' },
   ]
 
   const limitations = [
+    {label: 'International Sales'},
+    {label: 'Print'},
+    {label: 'LinkedIn Advertising'},
+    {label: 'Company Website'}
+  ]
+
+  const transformations = [
     {label: 'Blurred'},
     {label: 'Label Only'},
-    {label: 'Downsized'}
+    {label: 'Downsized'},
+    {label: 'Without Background'}
   ]
 
   return (
@@ -75,11 +84,22 @@ function Leftbox() {
       <FormControl fullWidth margin="normal">
         <Autocomplete
           disablePortal
-          id="purpose"
+          id="limitations"
           freeSolo
           multiple
           options={limitations}
           renderInput={(params) => <TextField {...params} label="Limitation" />}
+        />
+      </FormControl>
+
+      <FormControl fullWidth margin="normal">
+        <Autocomplete
+          disablePortal
+          id="transformation"
+          freeSolo
+          multiple
+          options={transformations}
+          renderInput={(params) => <TextField {...params} label="Data Transformation" />}
         />
       </FormControl>
 
