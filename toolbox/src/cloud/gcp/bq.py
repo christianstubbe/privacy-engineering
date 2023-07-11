@@ -1,6 +1,8 @@
 import os
 
 from google.cloud import bigquery
+from google.cloud.exceptions import GoogleCloudError
+
 import logging
 from . import gcp_router, credentials
 

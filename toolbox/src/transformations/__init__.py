@@ -1,8 +1,4 @@
-from transformations.blurring import *
-from transformations.erosion import *
-from transformations.blackwhite import *
-from transformations.remove_background import *
-from transformations.downsize import *
+from .transformations import *
 from enum import Enum
 from PIL import Image
 

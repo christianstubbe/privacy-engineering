@@ -1,83 +1,78 @@
-import os
-from google.cloud import storage
-import transformations
-from . import gcp_router, credentials
-import logging
-from fastapi import UploadFile
-from utils import calculate_image_hash, get_bytes
-from typing import Annotated, Union
-from PIL import Image
-from io import BytesIO
 import io
+import logging
+import os
+from io import BytesIO
+from http import HTTPStatus
+
+from PIL import Image
+from fastapi import UploadFile, File, Request, Depends, HTTPException
+from fastapi.responses import StreamingResponse
+from google.cloud import storage
+from google.cloud.exceptions import GoogleCloudError
+
+import transformations
+from access.pep import tag_content, control_access
+from utils import calculate_image_hash
+from . import gcp_router, credentials
 
 logger = logging.getLogger(__name__)
+
 client = storage.Client(credentials=credentials,
                         project=os.getenv("GCP_PROJECT_NAME"))
 
-bucket_name = "company_directory"
+bucket_name = "company_directory"  # TODO: convert to a config variable
 
 
 @gcp_router.post("/blob")
-async def create_gcs_object(file: UploadFile):
+async def upload_object(request: Request, file: UploadFile = File(...)):
     """
-    Uploads a file to a Google Cloud Storage bucket.
+    Uploads a file to a Cloud Storage bucket.
     """
     if not file:
-        return {"message": "No upload file sent"}
+        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail="No upload file sent")
+    # 1. Receive object
     file_contents = await file.read()
     img = Image.open(BytesIO(file_contents))
     buffer = io.BytesIO()
     img.save(buffer, format="JPEG")
     buffer.seek(0)
+    # 2. Create a reference
     destination_blob_name = calculate_image_hash(img)
+    purp = request.query_params.get("purpose")
+    if purp is None or purp == "":
+        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail="No purpose provided.")
+    tag_content(img, purp=purp)  # TODO: update
+    # 3. 
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(destination_blob_name)
-    blob.upload_from_file(buffer, content_type='image/jpeg')
-    logger.info(f"File {file.filename} uploaded to {destination_blob_name}.")
-    return {"result": "success"}
+    try:
+        blob.upload_from_file(buffer, content_type='image/jpeg')
+    except GoogleCloudError as e:
+        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail="No upload file sent")
+    if blob.exists():
+        return {"result": "success"}
 
 
-@gcp_router.get("/blob/{bucket_name}/{source_blob_name}")
-def read_gcs_object(bucket_name: str, source_blob_name: str) -> str:
+@gcp_router.get("/blob/{source_blob_name}", dependencies=[Depends(control_access)])
+def download_object(source_blob_name: str):
     """Return a blob from a bucket in Google Cloud Storage."""
-
-    storage_client = storage.Client()
-    bucket = storage_client.bucket(bucket_name)
+    # TODO: purpose must match, this is done in the PEP
+    bucket = client.get_bucket(bucket_name)
     blob = bucket.blob(source_blob_name)
-    img = blob()  # TODO
-    transformed_img = transformations.transform(img)
-    return transformed_img
+    image_data = blob.download_as_bytes()
+    image = Image.open(io.BytesIO(image_data))
+    # TODO: retrieve transformation from database
+    transformed_img = transformations.transform(image, transformations.Transformations.BLACKWHITE)
+    byte_arr = io.BytesIO()
+    # TODO: it's possible to programmatically read the mimetypes
+    transformed_img.save(byte_arr, format='JPEG')
+    byte_arr.seek(0)
+    return StreamingResponse(byte_arr, media_type="image/jpeg")
 
 
-# TODO: will it be needed?
-@gcp_router.put("/blob/{bucket_name}/{blob_name}/{new_name}")
-def update_gcs_object(bucket_name: str, blob_name: str, new_name: str):
-    """Renames a blob in Google Cloud Storage."""
-
-    storage_client = storage.Client()
-    bucket = storage_client.bucket(bucket_name)
-    blob = bucket.blob(blob_name)
-
-    new_blob = bucket.rename_blob(blob, new_name)
-
-    logger.info(f"Blob {blob.name} has been renamed to {new_blob.name}")
-
-
-@gcp_router.delete("/bucket/{bucket_name}/{blob_name}")
-def delete_gcs_object(bucket_name: str, blob_name: str) -> str:
-    """Deletes a blob from Google Cloud Storage."""
-
-    storage_client = storage.Client()
-    bucket = storage_client.bucket(bucket_name)
-    blob = bucket.blob(blob_name)
-    blob.delete()
-
-    logger.info(f"Blob {blob_name} in {bucket_name} was deleted.")
-
-
-@gcp_router.post("/bucket/{bucket_name}")
-def create_gcs_bucket(bucket_name: str):
+# @ehourdebaigt: I guess, this would have to be a check, we should assume that the bucket already exists
+def create_bucket(bucket_name: str):
     """Creates a bucket in Google Cloud Storage."""
 
     storage_client = storage.Client()
@@ -86,22 +81,13 @@ def create_gcs_bucket(bucket_name: str):
     logger.info(f"Bucket {bucket.name} created")
 
 
-# TODO: make it call
-@gcp_router.get("/gcs/bucket/{bucket_name}")
-def read_gcs_bucket(bucket_name: str):
-    """Returns all the blobs in a bucket Google Cloud Storage."""
-
+# TODO: would be interesting to limit access to this endpoint
+@gcp_router.get("/bucket")
+def list_bucket():
+    """
+    Returns all the blobs in a bucket Google Cloud Storage.
+    """
     storage_client = storage.Client()
     blobs = storage_client.list_blobs(bucket_name)
+    return {"blobs": [blob.name for blob in blobs]}
 
-    return blobs
-
-
-@gcp_router.delete("/bucket/{bucket_name}")
-def delete_gcs_bucket(bucket_name: str) -> None:
-    """Deletes a bucket in Google Cloud Stoage. The bucket must be empty."""
-
-    storage_client = storage.Client()
-    bucket = storage_client.get_bucket(bucket_name)
-    bucket.delete()
-    logger.info(f"Bucket {bucket.name} deleted")
