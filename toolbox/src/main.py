@@ -13,7 +13,7 @@ from cloud.gcp import gcp_router
 # Configure app-wide logging
 # N.B.: logs are automatically handle by the built-in interface of the cloud provider
 logging.basicConfig(
-    level=logging.DEBUG, format="%(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(name)s - %(levelname)s - %(message)s"
 )
 
 logger = logging.getLogger(__name__)

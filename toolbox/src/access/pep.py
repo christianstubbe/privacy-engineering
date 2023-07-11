@@ -22,7 +22,7 @@ def control_access():
     return _middleware
 
 
-def tag_content(content: Image, sub: str = None, act: str = None, purp: str = None):
+def tag_content(content: Image, sub: str = "", act: str = "", purp: str = ""):
     obj = calculate_image_hash(content)
     logger.info(f"Adding a new policy rule with sub: {sub}, obj: {obj}, act: {act}, purp: {purp}")
     enforcer.add_policy(sub, obj, act, purp)
