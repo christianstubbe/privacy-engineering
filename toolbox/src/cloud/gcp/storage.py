@@ -3,7 +3,7 @@ from google.cloud import storage
 import transformations
 from . import gcp_router, credentials
 import logging
-from fastapi import UploadFile
+from fastapi import UploadFile, File
 from utils import calculate_image_hash, get_bytes
 from typing import Annotated, Union
 from PIL import Image
@@ -11,16 +11,17 @@ from io import BytesIO
 import io
 
 logger = logging.getLogger(__name__)
+
 client = storage.Client(credentials=credentials,
                         project=os.getenv("GCP_PROJECT_NAME"))
 
-bucket_name = "company_directory"
+bucket_name = "company_directory"  # TODO: convert to a config variable
 
 
 @gcp_router.post("/blob")
-async def create_gcs_object(file: UploadFile):
+async def upload_object(file: UploadFile = File(...)):
     """
-    Uploads a file to a Google Cloud Storage bucket.
+    Uploads a file to a Cloud Storage bucket.
     """
     if not file:
         return {"message": "No upload file sent"}
@@ -39,7 +40,7 @@ async def create_gcs_object(file: UploadFile):
 
 
 @gcp_router.get("/blob/{bucket_name}/{source_blob_name}")
-def read_gcs_object(bucket_name: str, source_blob_name: str) -> str:
+def read_object(bucket_name: str, source_blob_name: str) -> str:
     """Return a blob from a bucket in Google Cloud Storage."""
 
     storage_client = storage.Client()
@@ -49,19 +50,6 @@ def read_gcs_object(bucket_name: str, source_blob_name: str) -> str:
     transformed_img = transformations.transform(img)
     return transformed_img
 
-
-# TODO: will it be needed?
-@gcp_router.put("/blob/{bucket_name}/{blob_name}/{new_name}")
-def update_gcs_object(bucket_name: str, blob_name: str, new_name: str):
-    """Renames a blob in Google Cloud Storage."""
-
-    storage_client = storage.Client()
-    bucket = storage_client.bucket(bucket_name)
-    blob = bucket.blob(blob_name)
-
-    new_blob = bucket.rename_blob(blob, new_name)
-
-    logger.info(f"Blob {blob.name} has been renamed to {new_blob.name}")
 
 
 @gcp_router.delete("/bucket/{bucket_name}/{blob_name}")
@@ -76,8 +64,8 @@ def delete_gcs_object(bucket_name: str, blob_name: str) -> str:
     logger.info(f"Blob {blob_name} in {bucket_name} was deleted.")
 
 
-@gcp_router.post("/bucket/{bucket_name}")
-def create_gcs_bucket(bucket_name: str):
+# @ehourdebaigt: I guess, this would have to be a check, we should assume that the bucket already exists
+def create_bucket(bucket_name: str):
     """Creates a bucket in Google Cloud Storage."""
 
     storage_client = storage.Client()
@@ -86,9 +74,8 @@ def create_gcs_bucket(bucket_name: str):
     logger.info(f"Bucket {bucket.name} created")
 
 
-# TODO: make it call
-@gcp_router.get("/gcs/bucket/{bucket_name}")
-def read_gcs_bucket(bucket_name: str):
+@gcp_router.get("/bucket/{bucket_name}")
+def list_bucket(bucket_name: str):
     """Returns all the blobs in a bucket Google Cloud Storage."""
 
     storage_client = storage.Client()
@@ -96,12 +83,3 @@ def read_gcs_bucket(bucket_name: str):
 
     return blobs
 
-
-@gcp_router.delete("/bucket/{bucket_name}")
-def delete_gcs_bucket(bucket_name: str) -> None:
-    """Deletes a bucket in Google Cloud Stoage. The bucket must be empty."""
-
-    storage_client = storage.Client()
-    bucket = storage_client.get_bucket(bucket_name)
-    bucket.delete()
-    logger.info(f"Bucket {bucket.name} deleted")
