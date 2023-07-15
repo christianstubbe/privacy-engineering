@@ -3,12 +3,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import logging
-from fastapi import FastAPI, Request, Depends
-# Middleware
-from access.pep import control_access
+from fastapi import FastAPI, Request
 # Router
-from access.pap import pap_router
-from cloud.gcp import gcp_router
+from access.pap import router as pap_router
+from cloud.gcp import router as cloud_router
+from auth import iap_jwt_middleware
 
 # Configure app-wide logging
 # N.B.: logs are automatically handle by the built-in interface of the cloud provider
@@ -20,10 +19,9 @@ logger = logging.getLogger(__name__)
 
 # Our main process
 app = FastAPI(debug=True)
-
+app.add_middleware(iap_jwt_middleware)
 app.include_router(pap_router, prefix="/api/v1/pap")
-app.include_router(gcp_router, prefix="/api/v1/gcp")
-# app.include_router(gcp_router, prefix="/api/v1/gcp", dependencies=[Depends(control_access())])
+app.include_router(cloud_router, prefix="/api/v1/gcp")
 
 
 @app.on_event("startup")

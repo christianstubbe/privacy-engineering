@@ -7,7 +7,7 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-pap_router = APIRouter()
+router = APIRouter()
 
 
 class PurposeIn(BaseModel):
@@ -26,7 +26,7 @@ class ListHandler(logging.Handler):
         self.log_list.append(record.msg)
 
 
-@pap_router.post("/purpose/{purpose_name}", status_code=200)
+@router.post("/purpose/{purpose_name}", status_code=200)
 async def add_purpose(purpose: PurposeIn):
     purpose_dict = purpose.dict()
     with session_scope() as session:
@@ -40,14 +40,14 @@ async def add_purpose(purpose: PurposeIn):
         return {**purpose_dict, "id": 0}
 
 
-@pap_router.get("/purposes")
+@router.get("/purposes")
 def list_purposes():
     with session_scope() as session:
         purposes = session.query(Purposes).all()
         return purposes
 
 
-@pap_router.get("/policy")
+@router.get("/policy")
 def get_policy():
     log_list = []
     handler = ListHandler(log_list)
@@ -57,7 +57,7 @@ def get_policy():
     return log_list
 
 
-@pap_router.put("/exception")
+@router.put("/exception")
 def add_exception(item):
     items_dict = item.dict()  # Request body
     purpose_name = items_dict["purpose"]

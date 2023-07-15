@@ -13,7 +13,7 @@ from google.cloud.exceptions import GoogleCloudError
 import transformations
 from access.pep import tag_content, control_access
 from utils import calculate_image_hash
-from . import gcp_router, credentials
+from . import router, credentials
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ client = storage.Client(credentials=credentials,
 bucket_name = "company_directory"  # TODO: convert to a config variable
 
 
-@gcp_router.post("/blob")
+@router.post("/blob")
 async def upload_object(request: Request, file: UploadFile = File(...)):
     """
     Uploads a file to a Cloud Storage bucket.
@@ -54,7 +54,7 @@ async def upload_object(request: Request, file: UploadFile = File(...)):
         return {"result": "success"}
 
 
-@gcp_router.get("/blob/{source_blob_name}", dependencies=[Depends(control_access)])
+@router.get("/blob/{source_blob_name}", dependencies=[Depends(control_access)])
 def download_object(source_blob_name: str):
     """Return a blob from a bucket in Google Cloud Storage."""
     # TODO: purpose must match, this is done in the PEP
@@ -82,7 +82,7 @@ def create_bucket(bucket_name: str):
 
 
 # TODO: would be interesting to limit access to this endpoint
-@gcp_router.get("/bucket")
+@router.get("/bucket")
 def list_bucket():
     """
     Returns all the blobs in a bucket Google Cloud Storage.
