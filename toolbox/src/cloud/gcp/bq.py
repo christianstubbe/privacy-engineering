@@ -4,21 +4,21 @@ from google.cloud import bigquery
 from google.cloud.exceptions import GoogleCloudError
 
 import logging
-from . import gcp_router, credentials
+from . import router, credentials
 
 logger = logging.getLogger(__name__)
 client = bigquery.Client(credentials=credentials,
                          project=os.getenv("GCP_PROJECT_NAME"))
 
 
-@gcp_router.get("/bq/{query}")
+@router.get("/bq/{query}")
 def query_bq(query: str):
     """Executes a client query in BigQuery and returns the result."""
     query_job = client.query(query)
     return list(query_job)
 
 
-@gcp_router.post("/bq")
+@router.post("/bq")
 def create_bq_dataset(dataset_id: str, location: str) -> str:
     """
     Create a new dataset in BigQuery based on the query params.
@@ -32,7 +32,7 @@ def create_bq_dataset(dataset_id: str, location: str) -> str:
     return {"result": "success"}
 
 
-@gcp_router.delete("/bq")
+@router.delete("/bq")
 def delete_bq_dataset(dataset_id: str) -> str:
     """Deletes a dataset in BigQuery."""
     client.delete_dataset(dataset_id, delete_contents=True, not_found_ok=True)

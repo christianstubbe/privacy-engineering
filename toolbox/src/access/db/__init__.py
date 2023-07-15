@@ -62,11 +62,3 @@ class Transformations(Base):
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base.metadata.create_all(bind=engine)
-
-
-def populate():
-    """
-    Populate the database with basic information (purposes, exceptions, transformations, ...) provided by the config file
-    """
-
-    pass

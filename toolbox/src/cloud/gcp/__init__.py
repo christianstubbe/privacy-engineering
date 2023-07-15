@@ -6,6 +6,6 @@ credentials = service_account.Credentials.from_service_account_file(os.getenv("G
 
 from fastapi import APIRouter
 
-gcp_router = APIRouter()
+router = APIRouter()
 import cloud.gcp.bq
 import cloud.gcp.storage
