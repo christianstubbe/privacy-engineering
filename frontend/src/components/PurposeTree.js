@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import { TreeContext } from '../Context';
+import React, {useContext, useEffect, useState} from 'react';
+import { TreeContext } from '../TreeContext';
 import { Chip } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
@@ -9,39 +9,38 @@ import TreeItem from '@mui/lab/TreeItem';
 
 const PurposeTree = () => {
   const { treeData, isLoading } = useContext(TreeContext);
-  const [selectedTransformations, setSelectedTransformations] = React.useState({});
+  const [expanded, setExpanded] = useState([]);
 
-  const handleChipClick = (nodeId, transformation) => {
-    setSelectedTransformations(prev => ({
-      ...prev,
-      [nodeId]: {
-        ...prev[nodeId],
-        [transformation]: !prev[nodeId]?.[transformation],
-      },
-    }));
-  };
+  useEffect(() => {
+    const getAllNodeIds = (nodes) => {
+      return nodes.reduce((acc, node) => {
+        return [...acc, node.purpose_id, ...getAllNodeIds(node.children || [])];
+      }, []);
+    };
+    setExpanded(getAllNodeIds(treeData));
+  }, [treeData]);
 
   const renderLabel = (nodeId, label, transformations) => (
     <div>
       <div>{label}</div>
-      <div>Transformations: </div>
-      <div>
+      <div>Transformations:
         {transformations.map(transformation => (
           <Chip
             key={transformation}
             label={transformation}
-            clickable
-            color={selectedTransformations[nodeId]?.[transformation] ? 'primary' : 'default'}
-            onClick={() => handleChipClick(nodeId, transformation)}
+            color={'primary'}
           />
         ))}
-      </div>
+        </div>
     </div>
   );
 
   const renderTree = (nodes) => (
     nodes.map((node) => (
-      <TreeItem nodeId={node.purpose_id.toString()} label={renderLabel(node.purpose_id, node.name, node.transformations)}>
+      <TreeItem
+          key={node.purpose_id}
+          nodeId={node.purpose_id.toString()}
+          label={renderLabel(node.purpose_id, node.name, node.transformations)}>
         {Array.isArray(node.children) ? renderTree(node.children) : null}
       </TreeItem>
     ))
@@ -55,6 +54,7 @@ const PurposeTree = () => {
     <TreeView
       defaultCollapseIcon={<ArrowDropDownIcon />}
       defaultExpandIcon={<ArrowRightIcon />}
+      defaultExpanded={expanded}
       multiSelect
     >
       {renderTree(treeData)}
