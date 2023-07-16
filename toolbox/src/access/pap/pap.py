@@ -1,7 +1,6 @@
 import logging
 from typing import Dict
 
-from fastapi import APIRouter
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -10,7 +9,7 @@ from access.db import get_db, Purpose, DataObjectPurpose, DataObject
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter()
+from . import router
 
 
 class ListHandler(logging.Handler):

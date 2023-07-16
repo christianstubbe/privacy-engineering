@@ -19,7 +19,7 @@ async def upload_yappl_file(yappl_file: UploadFile = File(...), db: Session = De
             policy.validate()
         except json.JSONDecodeError:
             raise HTTPException(status_code=400, detail="Invalid JSON file")
-        except ValidationError as e:  # catch YaPPL validation errors
+        except ValidationError as e:
             raise HTTPException(status_code=400, detail=str(e))
 
         for purpose in yappl_data['purposes']:

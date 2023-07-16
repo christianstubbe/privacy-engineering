@@ -20,7 +20,7 @@ function RetrieveData() {
   function toggle() {
     setIsOpen((isOpen) => !isOpen);
   }
-  
+
   const purposes = [
     { label: 'Sales' },
     { label: 'Microsoft 365' },
@@ -116,7 +116,7 @@ function RetrieveData() {
       </FormControl>
 
         <FormControl margin="normal">
-          <Fab 
+          <Fab
             onClick={toggle}
             color="primary" variant="extended" aria-label="add">
             Load Images
@@ -144,8 +144,8 @@ function RetrieveData() {
           ))}
         </ImageList>}
 
-    </Box> 
-  );  
+    </Box>
+  );
 }
 
 export default RetrieveData;
