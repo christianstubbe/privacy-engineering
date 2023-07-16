@@ -1,12 +1,12 @@
 """ This package for querying and uploading data to different cloud data storage solutions. """
 import os
-from sqlalchemy import create_engine, MetaData, Column, Integer, String, ForeignKey, Table
-from sqlalchemy.orm import relationship, sessionmaker, Session
-from sqlalchemy_utils import UUIDType
-from sqlalchemy.ext.declarative import declarative_base
 from contextlib import contextmanager
+
 from databases import Database
-import uuid
+from sqlalchemy import create_engine, MetaData
+from sqlalchemy.orm import sessionmaker, Session
+
+from .tables import *
 
 username = os.getenv("DB_USERNAME")
 password = os.getenv("DB_PASSWORD")
@@ -18,7 +18,7 @@ database = Database(connection_str)
 
 
 @contextmanager
-def session_scope():
+def get_db():
     """Provide a transactional scope around a series of operations."""
     session = Session(engine)
     try:
@@ -32,33 +32,7 @@ def session_scope():
 
 
 meta = MetaData()
-
-Base = declarative_base()
     
-    
-class Purposes(Base):
-    __tablename__ = "purposes"
-    id = Column(Integer, primary_key=True)
-    name = Column(String(100), nullable=False, unique=True)
-    # Column("parent_id", Integer, ForeignKey('tree.id')),
-    # relationship("parent", 'Tree', remote_side=[id])
-
-
-class Exceptions(Base):
-    __tablename__ = "exceptions"
-    id = Column(Integer, primary_key=True)
-    name = Column(String(100), unique=True)
-    purpose_id = Column(Integer, ForeignKey('purposes.id'))
-    exception_list = Column(String(100))
-
-
-class Transformations(Base):
-    __tablename__ = "transformations"
-    id = Column(Integer, primary_key=True)
-    name = Column(Integer, ForeignKey('purposes.id'), unique=True)
-    transformation_list = Column("transformation_list", String(100))
-
-
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base.metadata.create_all(bind=engine)

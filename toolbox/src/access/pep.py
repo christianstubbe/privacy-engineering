@@ -1,28 +1,51 @@
-from . import enforcer
 import logging
-from fastapi import Request
-from exceptions import InvalidPurposeException
-from PIL import Image
-from utils import calculate_image_hash
+from fastapi import Depends
+from sqlalchemy.orm import joinedload, Session
+from access.db import get_db, DataObjectPurpose, DataObject, Purpose
+
+
+def get_pep(db: Session = Depends(get_db)):
+    return PolicyEnforcementPoint(db)
+
 
 logger = logging.getLogger(__name__)
 
 
-def control_access():
-    def _middleware(request: Request):
-        sub = request.query_params.get("subject")
-        obj = request.query_params.get("object")
-        act = request.query_params.get("action")
-        purp = request.query_params.get("purpose")
+class PolicyEnforcementPoint:
+    def __init__(self, session: Session):
+        self.session = session
 
-        if not enforcer.enforce(sub, obj, act, purp):
-            raise InvalidPurposeException(purp)
-        return request
+    def get_permissions_for_purpose(self, data_object_id: int, purpose: str):
+        # Get the purpose tree for the given data object
+        purpose_tree = self.get_purpose_tree(data_object_id)
 
-    return _middleware
+        if not purpose_tree:
+            raise ValueError("Invalid data object ID")
 
+        # Initialize list to hold all the transformations
+        transformations = []
 
-def tag_content(content: Image, sub: str = "", act: str = "", purp: str = ""):
-    obj = calculate_image_hash(content)
-    logger.info(f"Adding a new policy rule with sub: {sub}, obj: {obj}, act: {act}, purp: {purp}")
-    enforcer.add_policy(sub, obj, act, purp)
+        # Traverse the purpose tree
+        self.traverse_tree(purpose_tree, purpose, transformations)
+
+        # Return all the transformations for the purpose
+        return transformations
+
+    def get_purpose_tree(self, data_object_id: int):
+        # Load the data object with its purposes and related purpose data
+        data_object = self.session.query(DataObject).options(
+            joinedload(DataObject.purposes).joinedload(DataObjectPurpose.purpose)
+        ).get(data_object_id)
+
+        # Return the purposes as the tree
+        return data_object.purposes if data_object else None
+
+    def traverse_tree(self, tree, purpose, transformations):
+        for node in tree:
+            if node.purpose.name == purpose and node.active:
+                transformations.append(node.purpose.transformations)
+
+            # Recurse into the parent purpose if it exists
+            if node.purpose.parent:
+                self.traverse_tree([node.purpose.parent], purpose, transformations)
+

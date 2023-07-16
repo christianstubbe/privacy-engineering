@@ -11,7 +11,8 @@ from google.cloud import storage
 from google.cloud.exceptions import GoogleCloudError
 
 import transformations
-from access.pep import tag_content, control_access
+from access.pep import get_pep, PolicyEnforcementPoint
+from http import HTTPStatus as status
 from utils import calculate_image_hash
 from . import router, credentials
 
@@ -41,7 +42,6 @@ async def upload_object(request: Request, file: UploadFile = File(...)):
     purp = request.query_params.get("purpose")
     if purp is None or purp == "":
         raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail="No purpose provided.")
-    tag_content(img, purp=purp)  # TODO: update
     # 3. 
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
@@ -54,15 +54,20 @@ async def upload_object(request: Request, file: UploadFile = File(...)):
         return {"result": "success"}
 
 
-@router.get("/blob/{source_blob_name}", dependencies=[Depends(control_access)])
-def download_object(source_blob_name: str):
+@router.get("/blob/{data_object_id}")
+def download_object(data_object_id: str, request: Request, pep: PolicyEnforcementPoint = Depends(get_pep)):
     """Return a blob from a bucket in Google Cloud Storage."""
+    purpose = request.query_params.get("purpose") or None
     # TODO: purpose must match, this is done in the PEP
     bucket = client.get_bucket(bucket_name)
-    blob = bucket.blob(source_blob_name)
+    blob = bucket.blob(data_object_id)
     image_data = blob.download_as_bytes()
     image = Image.open(io.BytesIO(image_data))
     # TODO: retrieve transformation from database
+    try:
+        return {"transformations": pep.get_permissions_for_purpose(data_object_id, purpose)}
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data object not found.")
     transformed_img = transformations.transform(image, transformations.Transformations.BLACKWHITE)
     byte_arr = io.BytesIO()
     # TODO: it's possible to programmatically read the mimetypes
