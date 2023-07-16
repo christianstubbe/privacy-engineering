@@ -1,0 +1,102 @@
+{
+  "metadata": {
+    "title": "Dummy YaPPL",
+    "description": "A simple YaPPL for testing purposes",
+    "date": "2023-07-16",
+    "version": "1.0.0"
+  },
+  "purposes": [
+    {
+      "id": "1",
+      "description": "Marketing",
+      "legalBasis": "consent",
+      "dataCategories": ["user images"],
+      "activations": [true],
+      "processingCategories": ["storage", "analysis"],
+      "thirdParties": ["thirdPartyA"],
+      "storageDurations": ["oneYear"],
+      "transformations": [
+        {
+          "operation": "blur",
+          "fields": ["image"]
+        }
+      ],
+      "children": [
+        {
+          "id": "1.1",
+          "description": "Research",
+          "legalBasis": "legitimateInterest",
+          "dataCategories": ["user images"],
+          "activations": [false],
+          "processingCategories": ["analysis"],
+          "thirdParties": ["thirdPartyB"],
+          "storageDurations": ["oneMonth"],
+          "transformations": [
+            {
+              "operation": "remove background",
+              "fields": ["image"]
+            }
+          ],
+          "children": [
+            {
+              "id": "1.1.1",
+              "description": "Military Research",
+              "legalBasis": "legalObligation",
+              "dataCategories": ["user images"],
+              "activations": [false],
+              "processingCategories": ["analysis"],
+              "thirdParties": ["thirdPartyC"],
+              "storageDurations": ["oneYear"],
+              "transformations": [
+                {
+                  "operation": "decayed",
+                  "fields": ["image"]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "description": "Identification",
+      "legalBasis": "legalObligation",
+      "dataCategories": ["user images"],
+      "activations": [true],
+      "processingCategories": ["storage"],
+      "thirdParties": ["thirdPartyD"],
+      "storageDurations": ["permanent"],
+      "transformations": [
+        {
+          "operation": "black and white",
+          "fields": ["image"]
+        }
+      ],
+      "children": [
+        {
+          "id": "2.1",
+          "description": "Printing",
+          "legalBasis": "consent",
+          "dataCategories": ["user images"],
+          "activations": [false],
+          "processingCategories": ["printing"],
+          "thirdParties": ["thirdPartyE"],
+          "storageDurations": ["oneMonth"],
+          "transformations": []
+        },
+        {
+          "id": "2.2",
+          "description": "HR",
+          "legalBasis": "contractualNeed",
+          "dataCategories": ["user images"],
+          "activations": [true],
+          "processingCategories": ["analysis"],
+          "thirdParties": ["thirdPartyF"],
+          "storageDurations": ["twoYears"],
+          "transformations": []
+        }
+      ]
+    }
+  ]
+}
