@@ -20,21 +20,15 @@ const PurposeTree = () => {
     setExpanded(getAllNodeIds(treeData));
   }, [treeData]);
 
-  const renderLabel = (
-    nodeId,
-    label,
-    transformations,
-    selected,
-    handleCheckboxChange
-  ) => (
+  const renderLabel = (nodeId, label, transformations, selected) => (
     <div style={{ display: "flex", alignItems: "center" }}>
-      <div>{label}</div>
       <Checkbox
         checked={selected}
         onChange={() => handleCheckboxChange(nodeId)}
         color="primary"
       />
-      <div>
+      <div>{label}</div>
+      <div style={{ marginLeft: "50px" }}>
         Transformations:
         {transformations.map((transformation) => (
           <Chip key={transformation} label={transformation} color={"primary"} />
