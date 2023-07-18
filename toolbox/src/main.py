@@ -38,12 +38,6 @@ async def shutdown():
     logger.info("Disconnected from the database!")
 
 
-@app.get("/")
-@app.get("/health")
-def health_check():
-    return {"status": "healthy"}
-
-
 # This function is for the cloud provider
 def entry_point(request: Request):
     logger.info(f"Serverless function was triggered! {request}")

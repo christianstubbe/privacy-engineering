@@ -49,3 +49,77 @@ class PolicyEnforcementPoint:
             if node.purpose.parent:
                 self.traverse_tree([node.purpose.parent], purpose, transformations)
 
+    async def create_data(self):
+        all_purposes = Purpose(
+            purpose_id=1,
+            name="All purposes",
+            selected=False,
+            transformations=[],
+            parent_id=None
+        )
+        self.session.add(all_purposes)
+
+        # Level 2
+        marketing = Purpose(
+            purpose_id=2,
+            name="Marketing",
+            selected=False,
+            transformations=["BLUR", "REMOVEBG"],
+            parent_id=1
+        )
+        self.session.add(marketing)
+
+        hr = Purpose(
+            purpose_id=11,
+            name="HR",
+            selected=False,
+            transformations=[],
+            parent_id=1
+        )
+        self.session.add(hr)
+
+        sales = Purpose(
+            purpose_id=16,
+            name="Sales",
+            selected=False,
+            transformations=["BLACKWHITE"],
+            parent_id=1
+        )
+        self.session.add(sales)
+
+        microsoft_365 = Purpose(
+            purpose_id=21,
+            name="Microsoft 365",
+            selected=False,
+            transformations=["REMOVEBG"],
+            parent_id=1
+        )
+        self.session.add(microsoft_365)
+
+        # Level 3
+        offline = Purpose(
+            purpose_id=3,
+            name="Offline",
+            selected=False,
+            transformations=["BLACKWHITE"],
+            parent_id=2
+        )
+        self.session.add(offline)
+
+        online = Purpose(
+            purpose_id=8,
+            name="Online",
+            selected=False,
+            transformations=["BLACKWHITE"],
+            parent_id=2
+        )
+        self.session.add(online)
+
+        print_advertising = Purpose(
+            purpose_id=4,
+            name="Print Advertising",
+            selected=False,
+            transformations=["REMOVEBG"],
+            parent_id=3
+        )
+        self.session.add(print_advertising)
