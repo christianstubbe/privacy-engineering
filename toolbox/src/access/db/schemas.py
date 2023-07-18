@@ -19,13 +19,6 @@ class DataObjectCreate(DataObjectBase):
     pass
 
 
-class DataObject(DataObjectBase):
-    id: int
-
-    class Config:
-        orm_mode = True
-
-
 class DataObjectPurposeBase(BaseModel):
     purpose_id: int
     selected: bool
@@ -34,9 +27,3 @@ class DataObjectPurposeBase(BaseModel):
 class DataObjectPurposeCreate(DataObjectPurposeBase):
     data_object_id: int
 
-
-class DataObjectPurpose(DataObjectPurposeBase):
-    id: int
-
-    class Config:
-        orm_mode = True

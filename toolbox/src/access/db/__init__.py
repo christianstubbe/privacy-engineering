@@ -1,13 +1,11 @@
-""" This package for querying and uploading data to different cloud data storage solutions. """
 import os
 
 from databases import Database
 from sqlalchemy import create_engine, MetaData
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import sessionmaker
 
-from contextlib import contextmanager
+from fastapi import HTTPException
 
-# TODO: from .tables import *
 
 username = os.getenv("DB_USERNAME")
 password = os.getenv("DB_PASSWORD")
@@ -16,20 +14,6 @@ db_name = os.getenv("DB_NAME")
 connection_str = f"postgresql://{username}:{password}@{url}/{db_name}"
 engine = create_engine(connection_str, echo=True)
 database = Database(connection_str)
-
-
-@contextmanager
-def get_db():
-    """Provide a transactional scope around a series of operations."""
-    session = Session(bind=engine)
-    try:
-        yield session
-        session.commit()
-    except Exception:
-        session.rollback()
-        raise
-    finally:
-        session.close()
 
 
 meta = MetaData()
@@ -75,3 +59,15 @@ class Purpose(Base):
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base.metadata.create_all(bind=engine)
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
+    finally:
+        db.close()

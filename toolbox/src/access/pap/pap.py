@@ -73,7 +73,7 @@ def read_purpose(purpose_id: int, db: Session = Depends(get_db)):
     return db_purpose
 
 
-@router.get("/purposes", response_model=List[PurposeModel])
+@router.get("/purposes")
 def read_purposes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     purposes = db.query(Purpose).offset(skip).limit(limit).all()
     return purposes
@@ -88,81 +88,80 @@ def add_purpose_to_tree(parent_id: int, purpose: PurposeModel, db: Session = Dep
     return {"name": purpose.name, "parent_id": parent_id, "metadata": purpose.metadata}
 
 
-@router.post("/upload/{parent_id}")
-async def add_object_with_tree(filename: str):
-    async with get_db() as db:
-        existing_object = db.query(DataObject).filter(DataObject.name == filename).first()
-        if existing_object is None:
-            raise HTTPException(status_code=404, detail="Object already exists.")
-    
-        do = DataObject(name=filename)
-        db.add(do)
-        dop = DataObjectPurpose(
-            active=True, 
-            purpose_id=1,
-            data_object_id=do.id
-        )
-        db.add(dop)
+@router.post("/data_object/{filename}")
+def add_object_with_tree(filename: str, db: Session = Depends(get_db)):
+    existing_object = db.query(DataObject).filter(DataObject.name == filename).first()
+    if existing_object is not None:
+        raise HTTPException(status_code=404, detail="Object already exists.")
+    # TODO: parse passed purpose tree
+    do = DataObject(name=filename)
+    db.add(do)
+    dop = DataObjectPurpose(
+        active=True,
+        purpose_id=1,
+        data_object_id=do.id
+    )
+    db.add(dop)
+    return {"results": filename}
 
         
 @router.get("/populate")
-async def populate():
-    with get_db() as db:
-        # Level 1
-        all_purposes = Purpose(
-            name="All purposes",
-            transformations=[],
-            parent_id=None
-        )
-        db.add(all_purposes)
+def populate(db: Session = Depends(get_db)):
+    # Level 1
+    all_purposes = Purpose(
+        name="All purposes",
+        transformations=[],
+        parent_id=None
+    )
+    db.add(all_purposes)
 
-        # Level 2
-        marketing = Purpose(
-            name="Marketing",
-            transformations=["BLUR", "REMOVEBG"],
-            parent_id=1
-        )
-        db.add(marketing)
+    # Level 2
+    marketing = Purpose(
+        name="Marketing",
+        transformations=["BLUR", "REMOVEBG"],
+        parent_id=1
+    )
+    db.add(marketing)
 
-        hr = Purpose(
-            name="HR",
-            transformations=[],
-            parent_id=1
-        )
-        db.add(hr)
+    hr = Purpose(
+        name="HR",
+        transformations=[],
+        parent_id=1
+    )
+    db.add(hr)
 
-        sales = Purpose(
-            name="Sales",
-            transformations=["BLACKWHITE"],
-            parent_id=1
-        )
-        db.add(sales)
+    sales = Purpose(
+        name="Sales",
+        transformations=["BLACKWHITE"],
+        parent_id=1
+    )
+    db.add(sales)
 
-        microsoft_365 = Purpose(
-            name="Microsoft 365",
-            transformations=["REMOVEBG"],
-            parent_id=1
-        )
-        db.add(microsoft_365)
+    microsoft_365 = Purpose(
+        name="Microsoft 365",
+        transformations=["REMOVEBG"],
+        parent_id=1
+    )
+    db.add(microsoft_365)
 
-        # Level 3
-        offline = Purpose(
-            name="Offline",
-            transformations=["BLACKWHITE"],
-            parent_id=2
-        )
-        db.add(offline)
+    # Level 3
+    offline = Purpose(
+        name="Offline",
+        transformations=["BLACKWHITE"],
+        parent_id=2
+    )
+    db.add(offline)
 
-        online = Purpose(
-            name="Online",
-            transformations=["BLACKWHITE"],
-            parent_id=2
-        )
-        db.add(online)
+    online = Purpose(
+        name="Online",
+        transformations=["BLACKWHITE"],
+        parent_id=2
+    )
+    db.add(online)
 
-        print_advertising = Purpose(
-            name="Print Advertising",
-            transformations=["REMOVEBG"],
-            parent_id=3
-        )
-        db.add(print_advertising)
+    print_advertising = Purpose(
+        name="Print Advertising",
+        transformations=["REMOVEBG"],
+        parent_id=3
+    )
+    db.add(print_advertising)
