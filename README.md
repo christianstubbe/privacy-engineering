@@ -1,23 +1,30 @@
-# Project Name
-> Toolbox for enforcing purpose-based access control in cloud native applications.
+
+# P3-Toolbox
+The P3-Toolbox enforces purpose-based access control in cloud-native applications. It is created as part of the module "Privacy Engineering" by Dr. Frank Pallas at Technische Universität Berlin. 
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](#)
 [![Terraform](https://github.com/christianstubbe/usability-engineering/actions/workflows/terraform.yml/badge.svg)](https://github.com/christianstubbe/usability-engineering/actions/workflows/terraform.yml)
 
 ## Table of Contents
-- [Project Name](#project-name)
-  - [Table of Contents](#table-of-contents)
-  - [Installation](#installation)
-    - [Prerequisites](#prerequisites)
-    - [Setup](#setup)
-  - [Usage](#usage)
-  - [Testing](#testing)
+
   - [Deployment](#deployment)
+  - [Local Installation](#local-installation)
   - [License](#license)
   - [Acknowledgements](#acknowledgements)
 
-## Installation
+## Deployment
+
+The toolbox is designed to be deployed on a event-driven serverless execution environment e.g. Google Cloud Functions. To simplify deployment in Google Cloud, there is a terraform configuration in the terraform folder.
+
+1. Edit ```terraform/main.tf``` and enter your project id, default zone and default region. 
+2. in the ```terraform/``` folder run ```terraform init``` 
+3. Run  ```terraform plan``` to create an execution plan to preview the changes that Terraform makes to your infrastructure. 
+4. Run ```terraform apply``` to execute the actions proposed in the terraform plan.
+
+If you do not want to use terraform to deploy the toolbox, you can run it in any python 3.11 runtime environment. The requirements are listed in ```toolbox/src/requirements.txt```
+
+## Local Installation
 
 ### Prerequisites
 
@@ -37,46 +44,21 @@ pip install -r requirements.txt
 pip install -r requirements.txt
 ```
 
-## Development
-
-### API Testing
-
-FastAPI comes with built-in support for automatic generation of API documentation, thanks to its use of Python type hints and the underlying Starlette framework. The built-in docs use OpenAPI and JSON Schema under the hood, so you can make use of any tooling that supports these standards.
-
-You can use these OpenAPI specifications to automatically create Postman requests. 
-
-Follow these steps:
-
-1. **Run your FastAPI application**: Run your FastAPI app using `uvicorn`. If your app is in a file called `main.py`, you would do:
-
-   ```bash
-   uvicorn main:app --reload
-   ```
-
-2. **Access the OpenAPI docs**: Open your browser and go to `http://localhost:8000/docs` (adjust the URL as necessary for your environment). This will display the Swagger UI, which is a visual representation of your API derived from the OpenAPI spec.
-
-3. **Get the OpenAPI JSON**: You can get the actual OpenAPI JSON used to generate this page by going to `http://localhost:8000/openapi.json`.
-
-4. **Import into Postman**: 
-
-   - Open Postman
-   - Click on `Import`
-   - Paste the URL from step 3 (i.e., `http://localhost:8000/openapi.json`)
-   - Select `Import as API`
-
-Postman will create a new collection with all your API endpoints, including parameters, request bodies, etc. Please note that the application needs to be running in order to access the OpenAPI JSON spec.
-
-## Testing
-
-Explain how to run the automated tests for this system.
-
-```sh
-example commands to run tests
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system or a platform.
+## Features
+The toolbox currently supports the following features. To create a feature request, go to the list of issues and click on the “New issue” button on the right. 
+- Policy decision making
+- Purpose policies
+	- Creation
+	- Deletion
+	- Modifiction
+	- Hierarchical organisation (purpose trees)
+	- Purpose limitation and exception
+- Data Transformation
+	- Image erosion
+	- Image background removal
+	- Image downsizing
+	- Image blurring
+	- Image grayscale
 
 
 ## License
@@ -85,4 +67,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Acknowledgements
 
-- Dr. Frank Pallas
+- Dr. Frank Pallas, Technische Universität Berlin
