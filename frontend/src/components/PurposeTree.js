@@ -8,7 +8,7 @@ import TreeItem from "@mui/lab/TreeItem";
 import Checkbox from "@mui/material/Checkbox";
 
 const PurposeTree = () => {
-  const { treeData, isLoading, handleCheckboxChange } = useContext(TreeContext);
+  const { treeData, handleCheckboxChange } = useContext(TreeContext);
   const [expanded, setExpanded] = useState([]);
 
   useEffect(() => {
@@ -20,43 +20,44 @@ const PurposeTree = () => {
     setExpanded(getAllNodeIds(treeData));
   }, [treeData]);
 
-  const renderLabel = (nodeId, label, transformations, selected) => (
-    <div style={{ display: "flex", alignItems: "center" }}>
-      <Checkbox
-        checked={selected}
-        onChange={() => handleCheckboxChange(nodeId)}
-        color="primary"
-      />
-      <div>{label}</div>
-      <div style={{ marginLeft: "50px" }}>
-        Transformations:
-        {transformations.map((transformation) => (
-          <Chip key={transformation} label={transformation} color={"primary"} />
-        ))}
-      </div>
+  const renderLabel = (nodeId, label, transformations, selected, disabled) => (
+  <div style={{ display: "flex", alignItems: "center" }}>
+    <Checkbox
+      checked={selected}
+      onChange={() => handleCheckboxChange(nodeId)}
+      color="primary"
+      disabled={disabled}
+    />
+    <div style={{ color: disabled ? "grey" : "inherit" }}>{label}</div>
+    <div style={{ marginLeft: "50px" }}>
+      Transformations:
+      {transformations.map((transformation) => (
+        <Chip key={transformation} label={transformation} color={"primary"} />
+      ))}
     </div>
-  );
+  </div>
+);
 
-  const renderTree = (nodes) =>
-    nodes.map((node) => (
+  const renderTree = (nodes, parentSelected = true) =>
+  nodes.map((node) => {
+    const disabled = !parentSelected;
+    return (
       <TreeItem
         key={node.purpose_id}
         nodeId={node.purpose_id.toString()}
-        label={renderLabel(node.purpose_id, node.name, node.transformations)}
+        label={renderLabel(node.purpose_id, node.name, node.transformations, node.selected, disabled)}
       >
-        {Array.isArray(node.children) ? renderTree(node.children) : null}
+        {Array.isArray(node.children) ? renderTree(node.children, node.selected && parentSelected) : null}
       </TreeItem>
-    ));
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+    );
+  });
 
   return (
     <TreeView
       defaultCollapseIcon={<ArrowDropDownIcon />}
       defaultExpandIcon={<ArrowRightIcon />}
       defaultExpanded={expanded}
+      expanded={expanded}
       multiSelect
     >
       {renderTree(treeData)}

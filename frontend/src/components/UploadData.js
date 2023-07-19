@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useContext } from "react";
 
 import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
@@ -7,12 +7,33 @@ import Box from "@mui/material/Box";
 import FormControl from "@mui/material/FormControl";
 import Divider from "@mui/material/Divider";
 import Fab from "@mui/material/Fab";
+import Alert from "@mui/material/Alert";
 
 import DeleteIcon from "@mui/icons-material/Delete";
 import PurposeTree from "./PurposeTree";
-import TreeContextProvider from "../TreeContext";
+import TreeContextProvider, { TreeContext } from "../TreeContext";
+import axios from "axios";
 
 function UploadData() {
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+
+  const handleImageChange = (e) => {
+    let files = [...e.target.files];
+    setSelectedFiles(files);
+    let images = files.map((file) => URL.createObjectURL(file));
+    setSelectedImages(images);
+  };
+
+  const handleDeleteImage = (indexToDelete) => {
+    setSelectedImages(
+      selectedImages.filter((_, index) => index !== indexToDelete)
+    );
+    setSelectedFiles(
+      selectedFiles.filter((_, index) => index !== indexToDelete)
+    );
+  };
+
   return (
     <Box sx={{ p: 5 }}>
       <Typography variant="h4" gutterBottom>
@@ -22,20 +43,25 @@ function UploadData() {
       <Typography variant="h5" gutterBottom>
         Current Photo
       </Typography>
-      <Avatar
-        alt="Headshot"
-        // src="https://placehold.co/128x128"
-        src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=128&h=128&fit=crop&auto=format"
-        sx={{ width: 128, height: 128 }}
-      />
-      <Fab
-        sx={{ marginLeft: "70px", marginTop: "-34px" }}
-        color="error"
-        variant="extended"
-        aria-label="delete"
-      >
-        <DeleteIcon />
-      </Fab>
+      <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+        {selectedImages.map((image, index) => (
+          <Box key={index} sx={{ margin: 1 }}>
+            <Avatar
+              alt={`Selected image ${index + 1}`}
+              src={image}
+              sx={{ width: 128, height: 128 }}
+            />
+            <Fab
+              sx={{ marginLeft: "70px", marginTop: "-34px" }}
+              color="error"
+              aria-label="delete"
+              onClick={() => handleDeleteImage(index)}
+            >
+              <DeleteIcon />
+            </Fab>
+          </Box>
+        ))}
+      </Box>
 
       <Divider sx={{ margin: "30px 0" }} />
 
@@ -43,7 +69,7 @@ function UploadData() {
         Upload new Photo
       </Typography>
 
-      <FormControl fullWidth>
+      <FormControl>
         <Button
           variant="outlined"
           color="inherit"
@@ -51,7 +77,12 @@ function UploadData() {
           sx={{ height: "56px" }}
         >
           Choose Photo(s)
-          <input type="file" hidden />
+          <input
+            type="file"
+            hidden
+            multiple
+            onChange={handleImageChange}
+          />
         </Button>
       </FormControl>
 
@@ -62,14 +93,47 @@ function UploadData() {
 
       <TreeContextProvider>
         <PurposeTree />
+        <UploadButton
+          selectedFiles={selectedFiles}
+        />
       </TreeContextProvider>
-
-      <FormControl margin="normal">
-        <Fab color="primary" variant="extended" aria-label="add">
-          Upload
-        </Fab>
-      </FormControl>
     </Box>
+  );
+}
+
+function UploadButton({ selectedFiles }) {
+  const { getSelectedNodeIds, treeData } = useContext(TreeContext);
+  const [validationError, setValidationError] = useState(false);
+
+
+  const handleSubmit = async () => {
+    const selectedNodeIds = getSelectedNodeIds(treeData);
+    if (selectedNodeIds.length === 0) {
+      setValidationError(true);
+      return;
+    }
+
+    const formData = new FormData();
+    selectedFiles.forEach((file, index) => {
+      formData.append(`image${index}`, file);
+    });
+    formData.append('purpose_ids', JSON.stringify(selectedNodeIds));
+
+    try {
+      const response = await axios.post("http://localhost:8000/api/v1/gcp/blob", formData);
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <FormControl margin="normal">
+      {validationError && <Alert severity="error">At least one purpose must be selected before uploading.</Alert>}
+      <Fab color="primary" variant="extended" aria-label="add" onClick={handleSubmit}>
+        Upload
+      </Fab>
+    </FormControl>
   );
 }
 
