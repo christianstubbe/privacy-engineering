@@ -12,10 +12,26 @@ import Typography from '@mui/material/Typography';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import Divider from '@mui/material/Divider';
+import {Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material";
+import Button from "@mui/material/Button";
 
 function RetrieveData() {
 
   const [isOpen, setIsOpen] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
+  const handleConfirmDialog = () => {
+    setOpenDialog(false);
+    toggle();
+  };
+
+  const handleButtonClick = () => {
+    setOpenDialog(true);
+  };
 
   function toggle() {
     setIsOpen((isOpen) => !isOpen);
@@ -104,25 +120,38 @@ function RetrieveData() {
           />
       </FormControl>
 
-      <FormControl fullWidth margin="normal">
-        <Autocomplete
-          disablePortal
-          id="transformation"
-          freeSolo
-          multiple
-          options={transformations}
-          renderInput={(params) => <TextField {...params} label="Data Transformation" />}
-        />
+        <FormControl margin="normal">
+        <Fab
+          onClick={handleButtonClick}
+          color="primary" variant="extended" aria-label="add">
+          Load Images
+          <SearchIcon />
+        </Fab>
       </FormControl>
 
-        <FormControl margin="normal">
-          <Fab 
-            onClick={toggle}
-            color="primary" variant="extended" aria-label="add">
-            Load Images
-            <SearchIcon />
-          </Fab>
-        </FormControl>
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Purpose Confirmation"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Do you confirm that you will use the retrieved data only for the given purposes?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            No, cancel this.
+          </Button>
+          <Button onClick={handleConfirmDialog} color="primary" style={{backgroundColor: 'forestgreen', color: 'white'}} autoFocus>
+            Yes, I confirm.
+          </Button>
+        </DialogActions>
+      </Dialog>
 
         <Divider sx={{ margin: '30px 0' }} />
 
