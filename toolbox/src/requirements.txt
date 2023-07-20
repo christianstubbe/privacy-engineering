@@ -4,7 +4,7 @@ asyncpg==0.28.0
 attrs==23.1.0
 bracex==2.1.1
 cachetools==5.3.1
-casbin==1.22.0
+casbin>=1.22.0
 casbin-databases-adapter==1.0.0
 casbin-pymongo-adapter==1.0.0
 casbin-sqlalchemy-adapter==0.5.2
