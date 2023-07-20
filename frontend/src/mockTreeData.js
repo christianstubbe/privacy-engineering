@@ -2,7 +2,7 @@ const mockTreeData = [
   {
     "purpose_id": 1,
     "name": "Marketing",
-    "selected": false,
+    "selected": true,
     "transformations": [
       "BLUR",
       "REMOVEBG"
