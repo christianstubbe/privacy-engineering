@@ -50,6 +50,9 @@ function Navbar() {
         <ListItem button key={'QueryData'} component={Link} to="/query">
           <ListItemText primary={'Retrieve Tabular Data'} />
         </ListItem>
+        <ListItem button key={'Settings'} component={Link} to="/settings">
+          <ListItemText primary={'Settings'} />
+        </ListItem>
       </List>
     </div>
   );

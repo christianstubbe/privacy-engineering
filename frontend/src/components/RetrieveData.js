@@ -1,6 +1,4 @@
-import React from "react";
-
-import { useState } from "react";
+import React, { useState, useEffect }from "react";
 
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
@@ -14,95 +12,71 @@ import ImageListItem from '@mui/material/ImageListItem';
 import Divider from '@mui/material/Divider';
 import {Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material";
 import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
 
 function RetrieveData() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
+  const [purposes, setPurposes] = useState([]);
+  const [selectedPurpose, setSelectedPurpose] = useState(null);
+  const [itemData, setItemData] = useState([]);
+  const [justification, setJustification] = useState("");  // New state for justification text
+  const [error, setError] = useState(false);  // New state for error handling
+
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
-  };
-
-  const handleConfirmDialog = () => {
-    setOpenDialog(false);
-    toggle();
   };
 
   const handleButtonClick = () => {
     setOpenDialog(true);
   };
 
-  function toggle() {
-    setIsOpen((isOpen) => !isOpen);
-  }
-  
-  const purposes = [
-    { label: 'Sales' },
-    { label: 'Microsoft 365' },
-    { label: 'LinkedIn' },
-    { label: 'Marketing' },
-    { label: 'Marketing – Offline' },
-    { label: 'Marketing – Online' },
-  ]
+  useEffect(() => {
+    fetch('/api/v1/pap/purposes')
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => setPurposes(data))
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+  }, []);
 
-  const transformations = [
-    {label: 'Blurred'},
-    {label: 'Label Only'},
-    {label: 'Downsized'},
-    {label: 'Without Background'}
-  ]
+  const handleLoadImages = () => {
+    setIsOpen(true);
+    fetch(`/api/v1/cloud/blob?purpose=${selectedPurpose.name}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => setItemData(data))
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+  };
 
-  const itemData = [
-    {
-      img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d',
-      title: 'Person'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1687360440361-1919309339e3',
-      title: 'Person'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb',
-      title: 'Person'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1580489944761-15a19d654956',
-      title: 'Person'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2',
-      title: 'Person'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1552374196-c4e7ffc6e126',
-      title: 'Person'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604',
-      title: 'Person'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1687360440741-f5df549b352d',
-      title: 'Person'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d',
-      title: 'Person'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330',
-      title: 'Person'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e',
-      title: 'Person'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1687360440102-78d15c3e5045',
-      title: 'Person'
+  const handleConfirmDialog = () => {
+    if (justification.trim().length === 0) { // Check if the justification text field is empty
+      setError(true);
+      return;
     }
-  ];
+    setOpenDialog(false);
+    handleLoadImages();  // Call the function to load images here
+  };
+
+  const handleJustificationChange = (event) => {
+    setJustification(event.target.value);
+    if (event.target.value.trim().length > 0) { // If the text field is not empty, clear the error
+      setError(false);
+    }
+  };
 
   return (
     <Box sx={{ p: 5 }} >
@@ -116,6 +90,8 @@ function RetrieveData() {
             disablePortal
             id="purpose"
             options={purposes}
+            getOptionLabel={(option) => option.name} // change 'name' to appropriate property in your objects
+            onChange={(event, newValue) => setSelectedPurpose(newValue)} // Save selected value
             renderInput={(params) => <TextField {...params} label="Purpose" />}
           />
       </FormControl>
@@ -140,14 +116,27 @@ function RetrieveData() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Do you confirm that you will use the retrieved data only for the given purposes?
+            Do you confirm that you will use the retrieved data only for the "{selectedPurpose ? selectedPurpose.label : ''}" purpose?
           </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="justification"
+            label="Justification"
+            type="text"
+            fullWidth
+            value={justification}
+            onChange={handleJustificationChange}
+            error={error}
+            helperText={error ? "You must provide a justification." : null}
+          />
+          {error && <Alert severity="error">Justification is required to proceed!</Alert>}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} color="primary">
             No, cancel this.
           </Button>
-          <Button onClick={handleConfirmDialog} color="primary" style={{backgroundColor: 'forestgreen', color: 'white'}} autoFocus>
+          <Button onClick={handleConfirmDialog} color="primary" style={{backgroundColor: 'forestgreen', color: 'white'}} autoFocus disabled={justification.trim().length === 0}>
             Yes, I confirm.
           </Button>
         </DialogActions>
