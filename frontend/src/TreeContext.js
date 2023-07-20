@@ -51,7 +51,7 @@ const initialState = {
 
 const deleteNodeFromTree = (treeData, nodeId) => {
     return treeData.filter(node => {
-        if (node.purpose_id === nodeId) {
+        if (node.id === nodeId) {
             return false;
         }
 
@@ -66,7 +66,7 @@ const deleteNodeFromTree = (treeData, nodeId) => {
 
 const addNodeToTree = (treeData, newNode) => {
     return treeData.map((node) => {
-        if (node.purpose_id === newNode.parent_id) {
+        if (node.id === newNode.parent_id) {
             return {...node, children: [...(node.children || []), newNode]};
         } else if (node.children && node.children.length > 0) {
             return {
@@ -82,7 +82,7 @@ const addNodeToTree = (treeData, newNode) => {
 
 const updateNodeSelection = (treeData, nodeToUpdate) => {
     return treeData.map((node) => {
-        if (node.purpose_id === nodeToUpdate.purpose_id) {
+        if (node.id === nodeToUpdate.id) {
             return {...node, selected: !node.selected};
         } else if (node.children && node.children.length > 0) {
             return {
@@ -158,7 +158,7 @@ const TreeContextProvider = ({children}) => {
     return (
         <TreeContext.Provider
             value={{
-                treeData: mockTreeData,
+                treeData: state.treeData,
                 isLoading: state.isLoading,
                 handleCheckboxChange,
                 getSelectedNodeIds,

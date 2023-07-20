@@ -4,7 +4,7 @@ from typing import Dict
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from access import enforcer as e
+# from access import enforcer as e
 from access.db import get_db, Purpose, DataObjectPurpose, DataObject
 
 logger = logging.getLogger(__name__)
@@ -62,8 +62,8 @@ def read_purpose(purpose_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/purposes")
-def read_purposes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    purposes = db.query(Purpose).offset(skip).limit(limit).all()
+def read_purposes(db: Session = Depends(get_db)):
+    purposes = db.query(Purpose).all()
     return purposes
 
 

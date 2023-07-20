@@ -60,7 +60,6 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base.metadata.create_all(bind=engine)
 
 
-@contextmanager
 def get_db() -> Session:
     db = SessionLocal()
     try:
@@ -147,5 +146,3 @@ purposes = [
             transformations=json.dumps(["REMOVEBG"]), parent_id=23),
 ]
 
-with get_db() as db:
-    db.add_all(purposes)

@@ -27,7 +27,6 @@ app.include_router(cloud_router, prefix="/api/v1/gcp")
 origins = [
     "http://localhost:3000",  # React app
     "http://localhost:8000",  # FastAPI server (if they are on the same machine)
-    # add more origins if needed
 ]
 
 app.add_middleware(
