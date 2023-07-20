@@ -144,7 +144,6 @@ const PurposeTree = ({settingsView = false}) => {
     return (
         <div>
             <TreeView
-                expanded={expanded}
                 defaultCollapseIcon={<ArrowDropDownIcon/>}
                 defaultExpandIcon={<ArrowRightIcon/>}
                 multiSelect

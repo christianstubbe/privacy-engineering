@@ -110,45 +110,43 @@ function UploadButton({selectedFiles}) {
     const [severity, setSeverity] = useState('success');
 
     const handleSubmit = async () => {
-        const selectedNodeIds = getSelectedNodeIds(treeData);
-        if (selectedNodeIds.length === 0) {
-            setValidationError(true);
-            return;
-        }
-
-        const formData = new FormData();
-        selectedFiles.forEach((file, index) => {
-            formData.append(`files`, file);
-        });
-        formData.append('purpose_ids', JSON.stringify(selectedNodeIds));
-        // TODO: remove, only for debugging
-        axios.interceptors.request.use(
-            function (config) {
-                console.log("Request:", config);
-                return config;
-            },
-            function (error) {
-                return Promise.reject(error);
+            const selectedNodeIds = getSelectedNodeIds(treeData);
+            if (selectedNodeIds.length === 0) {
+                setValidationError(true);
+                return;
             }
-        );
-        try {
-            const response = await axios.post("http://localhost:8000/api/v1/gcp/blob", formData);
-            console.log(response.data);
-            setSnackbarMessage('Upload Successful!');
-            setSeverity('success');
-            setSnackbarOpen(true);
-        } catch (error) {
-            console.error(error);
-            setSnackbarMessage('Upload Failed!');
-            setSeverity('error');
-            setSnackbarOpen(true);
-        }
 
-    };
+            const formData = new FormData();
+            selectedFiles.forEach((file, index) => {
+                formData.append(`files`, file);
+            });
+            formData.append('purpose_ids', JSON.stringify(selectedNodeIds));
+
+            try {
+                const response = await axios.post("http://localhost:8000/api/v1/cloud/blob", formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+                console.log(response.data);
+                setSnackbarMessage('Upload Successful!');
+                setSeverity('success');
+                setSnackbarOpen(true);
+            } catch
+                (error) {
+                console.error(error);
+                setSnackbarMessage('Upload Failed!' + error.response?.data?.detail);
+                setSeverity('error');
+                setSnackbarOpen(true);
+            }
+
+        }
+    ;
 
     return (
         <FormControl margin="normal">
-            {validationError && <Alert severity="error">At least one purpose must be selected before uploading.</Alert>}
+            {validationError &&
+                <Alert severity="error">At least one purpose must be selected before uploading.</Alert>}
             <Fab color="primary" variant="extended" aria-label="add" onClick={handleSubmit}>
                 Upload
             </Fab>

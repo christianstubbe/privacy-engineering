@@ -1,5 +1,4 @@
 import logging
-from typing import Dict
 
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -17,16 +16,6 @@ from access.db.schemas import *
 def read_purposes(db: Session = Depends(get_db)):
     purposes = db.query(Purpose).all()
     return purposes
-
-
-# TODO
-@router.post("/purposes")
-def add_purpose_to_tree(parent_id: int, purpose: PurposeModel, db: Session = Depends(get_db)):
-    db_parent = db.query(Purpose).filter(Purpose.id == parent_id).first()
-    if db_parent is None:
-        raise HTTPException(status_code=404, detail="Parent purpose not found")
-    db.add(Purpose(name=purpose.name, parent_id=parent_id, metadata=purpose.metadata))
-    return {"name": purpose.name, "parent_id": parent_id, "metadata": purpose.metadata}
 
 
 def create_data_object_purposes(db: Session, data_object, purpose_ids):

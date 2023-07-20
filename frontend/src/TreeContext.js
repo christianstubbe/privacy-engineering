@@ -95,13 +95,19 @@ const updateNodeSelection = (treeData, nodeToUpdate) => {
     });
 };
 
-const toggleNodeAndChildren = (treeData, selected) => {
+const toggleNodeAndChildren = (treeData, id, selected) => {
     return treeData.map((node) => {
-        const newNode = {...node, selected};
-        if (node.children) {
-            newNode.children = toggleNodeAndChildren(node.children, selected);
+        if (node.id === id) {
+            const newNode = {...node, selected};
+            if (node.children) {
+                newNode.children = toggleNodeAndChildren(node.children, id, selected);
+            }
+            return newNode;
+        } else if (node.children) {
+            return {...node, children: toggleNodeAndChildren(node.children, id, selected)};
+        } else {
+            return node;
         }
-        return newNode;
     });
 };
 
@@ -111,7 +117,7 @@ const getSelectedNodeIds = (treeData) => {
 
     const traverseTree = (node) => {
         if (node.selected) {
-            selectedIds.push(node.purpose_id);
+            selectedIds.push(node.id);
         }
 
         if (node.children) {
@@ -142,17 +148,36 @@ const TreeContextProvider = ({children}) => {
     }, []);
 
     const handleCheckboxChange = (nodeId) => {
-        const newTreeData = toggleNodeAndChildren(state.treeData, nodeId);
+        const findNode = (treeData, id) => {
+            for (const node of treeData) {
+                if (node.id === id) return node;
+                if (node.children) {
+                    const result = findNode(node.children, id);
+                    if (result) return result;
+                }
+            }
+            return null;
+        }
+
+        const nodeToChange = findNode(state.treeData, nodeId);
+
+        if (!nodeToChange) {
+            console.error(`Node with id ${nodeId} not found`);
+            return;
+        }
+
+        const newTreeData = toggleNodeAndChildren(state.treeData, nodeId, !nodeToChange.selected);
         dispatch({type: "UPDATE_TREE", payload: newTreeData});
     };
+
 
     const handleAddNodeContext = (newNode) => {
         dispatch({type: "ADD_NODE", payload: newNode});
     };
 
     const handleDeleteNodeContext = (nodeId) => {
-    dispatch({type: "DELETE_NODE", payload: nodeId});
-};
+        dispatch({type: "DELETE_NODE", payload: nodeId});
+    };
 
 
     return (

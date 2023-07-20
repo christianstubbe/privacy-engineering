@@ -39,12 +39,3 @@ class PolicyEnforcementPoint:
 
         # Return the purposes as the tree
         return data_object.purposes if data_object else None
-
-    def traverse_tree(self, tree, purpose, transformations):
-        for node in tree:
-            if node.purpose.name == purpose and node.active:
-                transformations.append(node.purpose.transformations)
-
-            # Recurse into the parent purpose if it exists
-            if node.purpose.parent:
-                self.traverse_tree([node.purpose.parent], purpose, transformations)
