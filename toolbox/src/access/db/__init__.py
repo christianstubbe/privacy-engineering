@@ -68,6 +68,6 @@ def get_db():
         db.commit()
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=400, detail=str(e))
+        raise
     finally:
         db.close()

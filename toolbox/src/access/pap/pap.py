@@ -1,6 +1,5 @@
 import logging
 from typing import Dict
-from typing import List
 
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -54,18 +53,7 @@ def generate_purpose_tree(purpose: PurposeModel, db: Session) -> Dict:
     return purpose_dict
 
 
-# Only relevant when casbin is used as PEP
-@router.get("/policy")
-def get_policy():
-    log_list = []
-    handler = ListHandler(log_list)
-    logger.addHandler(handler)
-    e.model.print_policy()
-    logger.removeHandler(handler)
-    return log_list
-
-
-@router.get("/purposes/{purpose_id}", response_model=PurposeModel)
+@router.get("/purposes/{purpose_id}")
 def read_purpose(purpose_id: int, db: Session = Depends(get_db)):
     db_purpose = db.query(Purpose).filter(Purpose.id == purpose_id).first()
     if db_purpose is None:
@@ -88,21 +76,21 @@ def add_purpose_to_tree(parent_id: int, purpose: PurposeModel, db: Session = Dep
     return {"name": purpose.name, "parent_id": parent_id, "metadata": purpose.metadata}
 
 
-@router.post("/data_object/{filename}")
-def add_object_with_tree(filename: str, db: Session = Depends(get_db)):
-    existing_object = db.query(DataObject).filter(DataObject.name == filename).first()
-    if existing_object is not None:
-        raise HTTPException(status_code=404, detail="Object already exists.")
-    # TODO: parse passed purpose tree
-    do = DataObject(name=filename)
-    db.add(do)
-    dop = DataObjectPurpose(
-        active=True,
-        purpose_id=1,
-        data_object_id=do.id
-    )
-    db.add(dop)
-    return {"results": filename}
+def create_data_object_purposes(db: Session, data_object, purpose_ids):
+    data_object_purposes = []
+
+    for purpose_id in purpose_ids:
+
+        purpose = db.query(Purpose).filter(Purpose.id == purpose_id).first()
+
+        data_object_purpose = DataObjectPurpose(
+            data_object=data_object,
+            purpose=purpose,
+            active=True
+        )
+        data_object_purposes.append(data_object_purpose)
+
+    return data_object_purposes
 
         
 @router.get("/populate")
