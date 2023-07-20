@@ -1,6 +1,6 @@
 
 # P3-Toolbox
-The P3-Toolbox enforces purpose-based access control in cloud-native applications. It is created as part of the module "Privacy Engineering" by Dr. Frank Pallas at Technische Universität Berlin. 
+The P3-Toolbox (Purpose-Based Privacy-Preserving Toolbox) enforces purpose-based access control in cloud-native applications. It is created as part of the module "Privacy Engineering" by Dr. Frank Pallas at Technische Universität Berlin. 
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](#)
