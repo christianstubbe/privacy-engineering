@@ -34,7 +34,9 @@ function RetrieveData() {
   };
 
   useEffect(() => {
-    fetch('/api/v1/pap/purposes')
+    fetch('/api/v1/pap/purposes', {
+          mode: 'cors',
+    })
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -49,7 +51,9 @@ function RetrieveData() {
 
   const handleLoadImages = () => {
     setIsOpen(true);
-    fetch(`/api/v1/cloud/blob?purpose=${selectedPurpose.name}`)
+    fetch(`/api/v1/cloud/blob?purpose=${selectedPurpose.name}`, {
+          mode: 'cors',
+    })
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

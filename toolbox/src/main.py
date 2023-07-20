@@ -4,7 +4,8 @@ load_dotenv()
 
 import logging
 from fastapi import FastAPI, Request
-# Router
+from fastapi.middleware.cors import CORSMiddleware
+# Routers
 from access.pap import router as pap_router
 from cloud.gcp import router as cloud_router
 from auth import JWTMiddleware
@@ -22,6 +23,20 @@ app = FastAPI(debug=True)
 app.add_middleware(JWTMiddleware)
 app.include_router(pap_router, prefix="/api/v1/pap")
 app.include_router(cloud_router, prefix="/api/v1/gcp")
+
+origins = [
+    "http://localhost:3000",  # React app
+    "http://localhost:8000",  # FastAPI server (if they are on the same machine)
+    # add more origins if needed
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.on_event("startup")
