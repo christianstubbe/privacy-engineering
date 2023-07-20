@@ -21,11 +21,12 @@ function RetrieveData() {
   const [purposes, setPurposes] = useState([]);
   const [selectedPurpose, setSelectedPurpose] = useState(null);
   const [itemData, setItemData] = useState([]);
-  const [justification, setJustification] = useState("");  // New state for justification text
+  const [justification, setJustification] = useState("");
   const [error, setError] = useState(false);  // New state for error handling
 
 
   const handleCloseDialog = () => {
+    setJustification("")
     setOpenDialog(false);
   };
 
@@ -34,7 +35,7 @@ function RetrieveData() {
   };
 
   useEffect(() => {
-    fetch('/api/v1/pap/purposes', {
+    fetch('http://localhost:8000/api/v1/pap/purposes', {
           mode: 'cors',
     })
       .then((response) => {
@@ -43,7 +44,14 @@ function RetrieveData() {
         }
         return response.json();
       })
-      .then((data) => setPurposes(data))
+      .then((data) => {
+        const simplifiedData = data.map(node => ({
+            id: node.id,
+            name: node.name,
+        }));
+
+        setPurposes(simplifiedData);
+    })
       .catch((error) => {
         console.error('Error:', error);
       });
@@ -51,13 +59,14 @@ function RetrieveData() {
 
   const handleLoadImages = () => {
     setIsOpen(true);
-    fetch(`/api/v1/cloud/blob?purpose=${selectedPurpose.name}`, {
+    fetch(`http://localhost:8000/api/v1/cloud/blob?purpose=${selectedPurpose.id}`, {
           mode: 'cors',
     })
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
+        console.log(response)
         return response.json();
       })
       .then((data) => setItemData(data))
@@ -67,17 +76,17 @@ function RetrieveData() {
   };
 
   const handleConfirmDialog = () => {
-    if (justification.trim().length === 0) { // Check if the justification text field is empty
+    if (justification.trim().length === 0) {
       setError(true);
       return;
     }
     setOpenDialog(false);
-    handleLoadImages();  // Call the function to load images here
+    handleLoadImages();
   };
 
   const handleJustificationChange = (event) => {
     setJustification(event.target.value);
-    if (event.target.value.trim().length > 0) { // If the text field is not empty, clear the error
+    if (event.target.value.trim().length > 0) {
       setError(false);
     }
   };
@@ -94,8 +103,8 @@ function RetrieveData() {
             disablePortal
             id="purpose"
             options={purposes}
-            getOptionLabel={(option) => option.name} // change 'name' to appropriate property in your objects
-            onChange={(event, newValue) => setSelectedPurpose(newValue)} // Save selected value
+            getOptionLabel={(option) => option.name}
+            onChange={(event, newValue) => setSelectedPurpose(newValue)}
             renderInput={(params) => <TextField {...params} label="Purpose" />}
           />
       </FormControl>
@@ -155,11 +164,9 @@ function RetrieveData() {
 
         {isOpen && <ImageList sx={{ width: 500, height: 450 }} cols={3} rowHeight={164}>
           {itemData.map((item) => (
-            <ImageListItem key={item.img}>
+            <ImageListItem key={item}>
               <img
-                src={`${item.img}?w=164&h=164&fit=crop&auto=format`}
-                srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-                alt={item.title}
+                src={`data:image/jpeg;base64,${item}`}
                 loading="lazy"
               />
             </ImageListItem>

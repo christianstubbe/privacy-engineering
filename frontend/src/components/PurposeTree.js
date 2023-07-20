@@ -132,7 +132,7 @@ const PurposeTree = ({settingsView = false}) => {
         nodes.map((node) => (
             <TreeItem
                 key={node.id}
-                nodeId={node.id}
+                nodeId={node.id.toString()}
                 label={renderLabel({...node, parentSelected: node.selected && parentSelected})}
             >
                 {Array.isArray(node.children) ? renderTree(node.children, node.selected && parentSelected) : null}

@@ -22,11 +22,11 @@ logger = logging.getLogger(__name__)
 app = FastAPI(debug=True)
 app.add_middleware(JWTMiddleware)
 app.include_router(pap_router, prefix="/api/v1/pap")
-app.include_router(cloud_router, prefix="/api/v1/gcp")
+app.include_router(cloud_router, prefix="/api/v1/cloud")
 
 origins = [
     "http://localhost:3000",  # React app
-    "http://localhost:8000",  # FastAPI server (if they are on the same machine)
+    "http://localhost:8000",  # FastAPI server
 ]
 
 app.add_middleware(

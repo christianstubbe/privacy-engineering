@@ -1,21 +1,20 @@
+import base64
 import io
+import json
 import logging
 import os
-import json
 from http import HTTPStatus
-from http import HTTPStatus as status
 from io import BytesIO
 from typing import List
 
 from PIL import Image
 from fastapi import UploadFile, File, Request, Depends, HTTPException, Form
-from fastapi.responses import StreamingResponse
 from google.cloud import storage
 from google.cloud.exceptions import GoogleCloudError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 import transformations
-from access.db import get_db, DataObject
+from access.db import get_db, DataObject, DataObjectPurpose
 from access.pap.pap import create_data_object_purposes
 from access.pep import get_pep, PolicyEnforcementPoint
 from utils import calculate_image_hash
@@ -36,7 +35,7 @@ async def upload_object(ids: str = Form(...),
     """
     Uploads a file to a Cloud Storage bucket.
     """
-    purpose_ids = json.loads(ids) # TODO: checks if purposes exist.
+    purpose_ids = json.loads(ids)  # TODO: checks if purposes exist.
     if len(files) < 1:
         raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail="No file to upload.")
     
@@ -68,24 +67,28 @@ async def upload_object(ids: str = Form(...),
     return {"result": "success" if exist else "failed"}
 
 
-@router.get("/blob/{data_object_id}")
-def download_object(data_object_id: str, request: Request, pep: PolicyEnforcementPoint = Depends(get_pep)):
+@router.get("/blob")
+def download_objects(request: Request, pep: PolicyEnforcementPoint = Depends(get_pep), db: Session = Depends(get_db)):
     """Return a blob from a bucket in Google Cloud Storage."""
-    purpose = request.query_params.get("purpose") or None
-    # TODO: purpose must match, this is done in the PEP
-    bucket = client.get_bucket(bucket_name)
-    blob = bucket.blob(data_object_id)
-    image_data = blob.download_as_bytes()
-    image = Image.open(io.BytesIO(image_data))
-    # TODO: retrieve transformation from DataObject
-    try:
-        return {"transformations": pep.get_permissions_for_purpose(data_object_id, purpose)}
-    except ValueError:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data object not found.")
-    transformed_img = transformations.transform(image, transformations.Transformations.BLACKWHITE)
-    byte_arr = io.BytesIO()
-    # TODO: it's possible to programmatically read the mimetypes
-    transformed_img.save(byte_arr, format='JPEG')
-    byte_arr.seek(0)
-    return StreamingResponse(byte_arr, media_type="image/jpeg")
+    purpose_id = request.query_params.get("purpose") or None
+    blobs = db.query(DataObjectPurpose).options(joinedload(DataObjectPurpose.data_object)).filter(DataObjectPurpose.purpose_id == purpose_id).all()
 
+    transformed_images = []
+
+    for blob in blobs:
+        bucket = client.get_bucket(bucket_name)
+        blob = bucket.blob(blob.data_object.name)
+        image_data = blob.download_as_bytes()
+        image = Image.open(io.BytesIO(image_data))
+        # TODO: retrieve transformation from DataObject
+        transformed_img = transformations.transform(image, transformations.Transformations.BLACKWHITE)
+        byte_arr = io.BytesIO()
+        # TODO: it's possible to programmatically read the mimetypes
+        transformed_img.save(byte_arr, format='JPEG')
+        byte_arr.seek(0)
+
+        # Encode the image to base64 and append to the list
+        transformed_images.append(base64.b64encode(byte_arr.read()).decode('utf-8'))
+
+    # Returns a list of base64 encoded images
+    return transformed_images
