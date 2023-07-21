@@ -11,8 +11,3 @@ def calculate_image_hash(image: Image) -> str:
     hex_dig = hash_object.hexdigest()
     return hex_dig
 
-
-def get_bytes(img: Image, format='JPEG'):
-    byte_arr = BytesIO()
-    img.save(byte_arr, format)
-    return byte_arr.getvalue().replace(b'\0', b'')

@@ -1,17 +1,18 @@
+import base64
 import io
+import json
 import logging
 import os
-from io import BytesIO
-from http import HTTPStatus
+from typing import List
 
 from PIL import Image
-from fastapi import UploadFile, File, Request, Depends, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi import UploadFile, File, Request, Depends, HTTPException, Form
 from google.cloud import storage
-from google.cloud.exceptions import GoogleCloudError
+from sqlalchemy.orm import Session, joinedload
 
 import transformations
-from access.pep import tag_content, control_access
+from access.db import get_db, DataObject, DataObjectPurpose, Purpose
+from access.pap.pap import create_data_object_purposes
 from utils import calculate_image_hash
 from . import router, credentials
 
@@ -20,74 +21,105 @@ logger = logging.getLogger(__name__)
 client = storage.Client(credentials=credentials,
                         project=os.getenv("GCP_PROJECT_NAME"))
 
-bucket_name = "company_directory"  # TODO: convert to a config variable
+
+def validate_purpose_ids(db: Session, ids: List[str]):
+    for id in ids:
+        purpose = db.query(Purpose).filter(Purpose.id == id).first()
+        if not purpose:
+            return False
+    return True
+
+
+def upload_to_bucket(blob_name, blob_data, content_type):
+    bucket_name = os.getenv('GOOGLE_CLOUD_BUCKET')
+    bucket = client.get_bucket(bucket_name)
+    blob = bucket.blob(blob_name)
+
+    blob.upload_from_string(
+        blob_data,
+        content_type=content_type
+    )
+
+    return blob.public_url
 
 
 @router.post("/blob")
-async def upload_object(request: Request, file: UploadFile = File(...)):
-    """
-    Uploads a file to a Cloud Storage bucket.
-    """
-    if not file:
-        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail="No upload file sent")
-    # 1. Receive object
-    file_contents = await file.read()
-    img = Image.open(BytesIO(file_contents))
-    buffer = io.BytesIO()
-    img.save(buffer, format="JPEG")
-    buffer.seek(0)
-    # 2. Create a reference
-    destination_blob_name = calculate_image_hash(img)
-    purp = request.query_params.get("purpose")
-    if purp is None or purp == "":
-        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail="No purpose provided.")
-    tag_content(img, purp=purp)  # TODO: update
-    # 3. 
-    storage_client = storage.Client()
-    bucket = storage_client.bucket(bucket_name)
-    blob = bucket.blob(destination_blob_name)
-    try:
-        blob.upload_from_file(buffer, content_type='image/jpeg')
-    except GoogleCloudError as e:
-        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail="No upload file sent")
-    if blob.exists():
-        return {"result": "success"}
+async def upload_object(
+    purpose_ids: str = Form(...),
+    files: List[UploadFile] = File(...),
+    db: Session = Depends(get_db),
+):
+    ids = json.loads(purpose_ids)
+    if not validate_purpose_ids(db, ids):
+        raise HTTPException(status_code=400, detail="Invalid purpose ids.")
+
+    if len(files) < 1:
+        raise HTTPException(status_code=422, detail="No file to upload.")
+
+    results = []
+    for file in files:
+        try:
+            file_contents = await file.read()
+            img = Image.open(io.BytesIO(file_contents))
+            img_format = img.format
+
+            destination_blob_name = calculate_image_hash(img)
+
+            upload_to_bucket(destination_blob_name, file_contents,
+                             content_type=f'image/{img_format}')
+
+            # Create a reference to a DataObject in the DB
+            do = DataObject(name=destination_blob_name)
+            db.add(do)
+
+            # Link the DataObject to its purposes
+            data_object_purposes = create_data_object_purposes(db, do, ids)
+            db.add_all(data_object_purposes)
+
+            db.commit()
+            results.append({"filename": file.filename, "result": "success"})
+        except:
+            pass
+        # except Exception as e:
+        #    logger.error(f"Failed to process file {file.filename}: {str(e)}")
+        #    results.append({"filename": file.filename, "result": "error", "detail": str(e)})
+    return results
 
 
-@router.get("/blob/{source_blob_name}", dependencies=[Depends(control_access)])
-def download_object(source_blob_name: str):
+@router.get("/blob")
+def download_objects(request: Request, db: Session = Depends(get_db)):
     """Return a blob from a bucket in Google Cloud Storage."""
-    # TODO: purpose must match, this is done in the PEP
-    bucket = client.get_bucket(bucket_name)
-    blob = bucket.blob(source_blob_name)
-    image_data = blob.download_as_bytes()
-    image = Image.open(io.BytesIO(image_data))
-    # TODO: retrieve transformation from database
-    transformed_img = transformations.transform(image, transformations.Transformations.BLACKWHITE)
-    byte_arr = io.BytesIO()
-    # TODO: it's possible to programmatically read the mimetypes
-    transformed_img.save(byte_arr, format='JPEG')
-    byte_arr.seek(0)
-    return StreamingResponse(byte_arr, media_type="image/jpeg")
+    purpose_id = request.query_params.get("purpose") or None
+    blobs = db.query(DataObjectPurpose).options(
+        joinedload(DataObjectPurpose.data_object),
+        joinedload(DataObjectPurpose.purpose).joinedload(Purpose.transformation)
+    ).filter(
+        DataObjectPurpose.purpose_id == purpose_id).all()
 
+    transformed_images = []
 
-# @ehourdebaigt: I guess, this would have to be a check, we should assume that the bucket already exists
-def create_bucket(bucket_name: str):
-    """Creates a bucket in Google Cloud Storage."""
+    for blob in blobs:
+        bucket = client.get_bucket(os.getenv("GOOGLE_CLOUD_BUCKET"))
+        blob_object = bucket.blob(blob.data_object.name)
+        image_data = blob_object.download_as_bytes()
+        image = Image.open(io.BytesIO(image_data))
 
-    storage_client = storage.Client()
-    bucket = storage_client.create_bucket(bucket_name)
+        transformation = blob.purpose.transformation
 
-    logger.info(f"Bucket {bucket.name} created")
+        if transformation.blackwhite:
+            image = transformations.black_white(image)
+        if transformation.removebg:
+            image = transformations.remove_background(image)
+        if transformation.blur:
+            image = transformations.blur(image)
+        if transformation.downsize:
+            image = transformations.downsize(image)
+        if transformation.erosion:
+            image = transformations.erosion(image)
 
+        byte_arr = io.BytesIO()
+        image.save(byte_arr, format='JPEG')
+        byte_arr.seek(0)
+        transformed_images.append(base64.b64encode(byte_arr.read()).decode('utf-8'))
 
-# TODO: would be interesting to limit access to this endpoint
-@router.get("/bucket")
-def list_bucket():
-    """
-    Returns all the blobs in a bucket Google Cloud Storage.
-    """
-    storage_client = storage.Client()
-    blobs = storage_client.list_blobs(bucket_name)
-    return {"blobs": [blob.name for blob in blobs]}
-
+    return transformed_images
