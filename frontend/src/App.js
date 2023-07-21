@@ -6,7 +6,6 @@ import RetrieveData from "./components/RetrieveData";
 import Navbar from "./components/Navbar.js";
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import Home from "./components/Home";
-import QueryData from "./components/QueryData";
 import Settings from "./components/Settings";
 
 
@@ -21,7 +20,6 @@ function App() {
                     <Route path='/' element={<Home/>}/>
                     <Route path='/retrieve' element={<RetrieveData/>}/>
                     <Route path='/upload' element={<UploadData/>}/>
-                    <Route path='/query' element={<QueryData/>}/>
                     <Route path='/settings' element={<Settings/>}/>
                 </Routes>
             </BrowserRouter>

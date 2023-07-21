@@ -47,9 +47,6 @@ function Navbar() {
         <ListItem button key={'UploadData'} component={Link} to="/upload">
           <ListItemText primary={'Upload Images'} />
         </ListItem>
-        <ListItem button key={'QueryData'} component={Link} to="/query">
-          <ListItemText primary={'Retrieve Tabular Data'} />
-        </ListItem>
         <ListItem button key={'Settings'} component={Link} to="/settings">
           <ListItemText primary={'Settings'} />
         </ListItem>

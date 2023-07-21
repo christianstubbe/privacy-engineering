@@ -1,7 +1,6 @@
 import React, {createContext, useReducer, useEffect} from "react";
 import {CircularProgress} from "@mui/material";
 import axios from "axios";
-import mockTreeData from "./mockTreeData";
 
 const reducer = (state, action) => {
     switch (action.type) {
@@ -79,21 +78,6 @@ const addNodeToTree = (treeData, newNode) => {
     });
 };
 
-
-const updateNodeSelection = (treeData, nodeToUpdate) => {
-    return treeData.map((node) => {
-        if (node.id === nodeToUpdate.id) {
-            return {...node, selected: !node.selected};
-        } else if (node.children && node.children.length > 0) {
-            return {
-                ...node,
-                children: updateNodeSelection(node.children, nodeToUpdate),
-            };
-        } else {
-            return node;
-        }
-    });
-};
 
 const toggleNodeAndChildren = (treeData, id, selected) => {
     return treeData.map((node) => {

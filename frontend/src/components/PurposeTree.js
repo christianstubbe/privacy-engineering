@@ -30,33 +30,36 @@ const PurposeTree = ({settingsView = false}) => {
     const [transformations, setTransformations] = useState({
         REMOVEBG: false,
         BLACKWHITE: false,
-        BLUR: false,
-        REDACT_EMAIL: false
+        EROSION: false,
+        BLUR: true,
     });
+
+    const getAllNodeIds = (nodes) => {
+        return nodes.reduce((acc, node) => {
+            return [...acc, node.id, ...getAllNodeIds(node.children || [])];
+        }, []);
+    };
 
     const listToTree = (list) => {
         const map = {}, roots = [], nodeList = JSON.parse(JSON.stringify(list));
-
-        // First loop to initialize 'children' and 'level' for each node and fill the map
         for (let i = 0; i < nodeList.length; i += 1) {
             map[nodeList[i].id] = nodeList[i];
             nodeList[i].children = nodeList[i].children || [];
             nodeList[i].level = 0; // add level property for root nodes
+            nodeList[i].transformation = nodeList[i].transformation || []
         }
 
-        // Second loop to connect all nodes to their parents
         for (let i = 0; i < nodeList.length; i += 1) {
             const node = nodeList[i];
-            if (node.parent_id !== null && map[node.parent_id]) { // if parent exists
-                map[node.parent_id].children.push({...node, level: map[node.parent_id].level + 1}); // add child to parent
+            if (node.parent_id !== null && map[node.parent_id]) {
+                map[node.parent_id].children.push({...node, level: map[node.parent_id].level + 1});
             } else {
-                roots.push(node); // if parent does not exist, it is a root
+                roots.push(node);
             }
         }
 
         return roots;
-    }
-
+    };
 
     const handleAddNode = (nodeId) => {
         setNewNodeParentId(nodeId);
@@ -69,8 +72,8 @@ const PurposeTree = ({settingsView = false}) => {
         setTransformations({
             REMOVEBG: false,
             BLACKWHITE: false,
+            EROSION: false,
             BLUR: false,
-            REDACT_EMAIL: false
         });
         setDialogOpen(false);
     };
@@ -82,16 +85,14 @@ const PurposeTree = ({settingsView = false}) => {
     };
 
     useEffect(() => {
-        const getAllNodeIds = (nodes) => {
-            return nodes.reduce((acc, node) => {
-                return [...acc, node.id, ...getAllNodeIds(node.children || [])];
-            }, []);
-        };
         setExpanded(getAllNodeIds(treeData));
     }, [treeData]);
 
     const renderLabel = (node) => {
         const disabled = node.level > 0 && !node.parentSelected;
+        const trueTransformations = Object.entries(node.transformation || {})
+            .filter(([key, value]) => value)
+            .map(([key]) => key);
         return (
             <div style={{display: "flex", flexDirection: "column"}}>
                 <div style={{display: "flex", alignItems: "center", justifyContent: "space-between"}}>
@@ -120,7 +121,7 @@ const PurposeTree = ({settingsView = false}) => {
                 <Typography variant="body2" color="textSecondary">{node.description}</Typography>
                 <div style={{marginTop: "8px"}}>
                     Transformations:
-                    {(Array.isArray(node.transformations) ? node.transformations : JSON.parse(node.transformations || '[]')).map((transformation) => (
+                    {trueTransformations.map((transformation) => (
                         <Chip key={transformation} label={transformation} color={"primary"}/>
                     ))}
                 </div>
@@ -167,6 +168,7 @@ const PurposeTree = ({settingsView = false}) => {
                     />
                     {Object.keys(transformations).map((key) => (
                         <FormControlLabel
+                            key={key}
                             control={
                                 <Checkbox
                                     checked={transformations[key]}

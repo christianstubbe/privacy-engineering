@@ -89,7 +89,7 @@ function UploadData() {
 
             <Divider sx={{margin: "30px 0"}}/>
             <Typography variant="h5" gutterBottom>
-                Select Purpose
+                Select Purpose(s)
             </Typography>
 
             <TreeContextProvider>

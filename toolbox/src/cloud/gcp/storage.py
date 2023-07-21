@@ -3,20 +3,16 @@ import io
 import json
 import logging
 import os
-from http import HTTPStatus
-from io import BytesIO
 from typing import List
 
 from PIL import Image
 from fastapi import UploadFile, File, Request, Depends, HTTPException, Form
 from google.cloud import storage
-from google.cloud.exceptions import GoogleCloudError
 from sqlalchemy.orm import Session, joinedload
 
 import transformations
 from access.db import get_db, DataObject, DataObjectPurpose, Purpose
 from access.pap.pap import create_data_object_purposes
-from access.pep import get_pep, PolicyEnforcementPoint
 from utils import calculate_image_hash
 from . import router, credentials
 
@@ -91,7 +87,7 @@ async def upload_object(
 
 
 @router.get("/blob")
-def download_objects(request: Request, pep: PolicyEnforcementPoint = Depends(get_pep), db: Session = Depends(get_db)):
+def download_objects(request: Request, db: Session = Depends(get_db)):
     """Return a blob from a bucket in Google Cloud Storage."""
     purpose_id = request.query_params.get("purpose") or None
     blobs = db.query(DataObjectPurpose).options(
