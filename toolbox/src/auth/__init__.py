@@ -1,9 +1,9 @@
 import os
 
-from fastapi import FastAPI, Request, HTTPException, Response
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-from jose import jwt, JWTError
 import requests
+from fastapi import Request, HTTPException, Response
+from jose import jwt, JWTError
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
 project_nb = os.getenv("GCP_PROJECT_NB")
 project_name = os.getenv("GCP_PROJECT_NAME")

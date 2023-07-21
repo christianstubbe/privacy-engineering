@@ -86,7 +86,7 @@ const PurposeTree = ({settingsView = false}) => {
 
     useEffect(() => {
         setExpanded(getAllNodeIds(treeData));
-    }, [treeData]);
+    }, [treeData, getAllNodeIds]);
 
     const renderLabel = (node) => {
         const disabled = node.level > 0 && !node.parentSelected;

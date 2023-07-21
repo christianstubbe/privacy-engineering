@@ -1,6 +1,4 @@
-import json
 import os
-from contextlib import contextmanager
 
 from databases import Database
 from sqlalchemy import create_engine, MetaData
@@ -16,7 +14,7 @@ database = Database(connection_str)
 
 meta = MetaData()
 
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, JSON
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 

@@ -8,5 +8,4 @@ credentials = service_account.Credentials.from_service_account_info(service_acco
 from fastapi import APIRouter
 
 router = APIRouter()
-import cloud.gcp.bq
 import cloud.gcp.storage
